@@ -1,0 +1,60 @@
+@mixin flex($direction) {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: $direction;
+}
+  
+@mixin setHeight($height) {
+height: $height;
+line-height: $height;
+}
+
+
+// reset element dialog样式
+.el-dialog__header{
+    background: #4882F0;
+    .el-dialog__title{
+        color: #fff !important;
+    } 
+}
+
+.el-dialog__headerbtn .el-dialog__close{
+     color: #fff !important;
+}
+
+.el-dialog__footer{
+    text-align: center;
+}
+
+.el-dialog__body{
+    padding: 30px 20px 0px;
+}
+
+.dialog-footer{
+    text-align: center;
+    margin: 0 auto;
+}
+
+// el-form的样式修改
+.row-item-form{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+// 基本弹框的一些基本操作
+.pwd-dialog_item{
+    @include flex(flex-start);
+    align-items: center;
+    margin-bottom: 22px;
+    .pwd-label{
+        width: 100px;
+        text-align: left;
+    }
+    .pwd-dialog_input{
+        width: 350px;
+    }
+}
+
