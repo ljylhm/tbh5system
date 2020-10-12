@@ -1,48 +1,27 @@
 <template>
   <div class="login-container">
-    <div class="login-content">
-      <div class="login-header">用户登录</div>
+    <h2 class="login-text">欢迎来到百手联盟</h2>
+    <div class="login-bg"></div>
 
-      <div class="login-input-container">
-          <div class="login-input_item">
-              <div class="login-input_item_label">账号:</div>
-              <div class="login-input_item_content">
-                <el-input
-                    placeholder="请输入注册时的手机号码"
-                    v-model='form.name'
-                    size="medium">
-                    <i slot="prefix" class="el-input__icon el-icon-user"></i>
-                  </el-input>
-              </div>
-          </div>
-          <div class="login-input_item space-margin-top-30">
-             <div class="login-input_item_label">密码:</div>
-             <div class="login-input_item_content">
-                <el-input
-                    placeholder="请输入密码"
-                    v-model='form.password'
-                    size="medium">
-                    <i slot="prefix" class="el-input__icon el-icon-lock"></i>
-                  </el-input>
-              </div>
-          </div>
+    <div class="login-form_container">
+      <van-cell-group>
+        <van-field v-model="form.user" label="账号" placeholder="请输入账号" />
+        <van-field
+          v-model="form.password"
+          label="密码"
+          placeholder="请输入密码"
+        />
+      </van-cell-group>
+    </div>
 
-          <div class="login-btn">
-            <el-button
-              size="medium" 
-              type="primary">
-              登录
-            </el-button>
-         </div>
+    <div class="login-btn">
+      <van-button type="info" size="small">登录</van-button>
+      <div class="login-forget_password">忘记密码</div>
+    </div>
 
-         <div class="login-tips">
-            <el-link @click="toForget">会员注册</el-link>
-            <el-link>忘记密码</el-link>
-         </div>
-      </div>
-
-      
-
+    <div class="login-register">
+      没有账号？
+      <span @click="toRegister">去登录</span>
     </div>
   </div>
 </template>
@@ -50,7 +29,7 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
-import { routerHelper } from "@/login/router"
+import { routerHelper } from "@/login/router";
 
 interface IProps {}
 
@@ -60,18 +39,18 @@ interface IProps {}
   },
 })
 export default class Login extends Vue<IProps> {
-  
-  data() {
-    return {
-      form:{
-        name:""
-      }
-    };
+  form = {
+    user: "",
+    password: "",
+  };
+
+  toForget() {
+    routerHelper.to("/forget");
   }
 
-  toForget(){
-      routerHelper.to("/forget")
-  } 
+  toRegister(){
+     routerHelper.to("/register");
+  }
 
   beforeCreated() {
     console.log("进入了这里...");
@@ -80,7 +59,6 @@ export default class Login extends Vue<IProps> {
 </script>
 
 <style lang="scss">
-
 @mixin flex($direction) {
   display: flex;
   flex-direction: row;
@@ -88,65 +66,58 @@ export default class Login extends Vue<IProps> {
   justify-content: $direction;
 }
 
-.space-margin-top-30{
+.space-margin-top-30 {
   margin-top: 30px;
 }
 
 .login-container {
   width: 100vw;
   height: 100vh;
-  background: url("../../assets/login-bg.jpg") no-repeat center center;
-  background-size: cover;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  .login-content {
-    width: 400px;
-    height: auto;
-    border-radius: 15px;
-    background: #fff;
-    .login-header {
-      width: 100%;
-      height: 50px;
-      line-height: 50px;
-      box-sizing: border-box;
-      padding: 0px 20px;
-      font-weight: 600;
-      color: #323232;
-      font-size: 18px;
-      border-bottom: 1px solid #ddd;
-    }
+  position: relative;
+  padding-top: 25%;
+  .login-text {
+    text-align: center;
+    font-size: 16px;
+    color: #4882f0;
+  }
+  .login-bg {
+    width: 100px;
+    height: 100px;
+    margin: 20px auto 0px;
+    background: url(http://img.baishou123.cn/data/upload/fen/2020-08-08/5f2eb50c0839a.png)
+      no-repeat center center;
+    background-size: 100% 100%;
+  }
 
-    .login-input-container{
-      box-sizing: border-box;
-      padding: 30px;
-      .login-input_item{
-        @include flex(flex-start);
-        align-items: center;
-        .login-input_item_label{
-           width: 60px;
-        }
-        .login-input_item_content{
-          flex: 1;
-        }
-      }
-    }
-    
-    .login-tips{
+  .login-form_container {
+    width: 280px;
+    height: auto;
+    margin: 0 auto;
+  }
+
+  .login-btn {
+    width: 280px;
+    height: auto;
+    margin: 12px auto 0px;
+    button {
       width: 100%;
-      @include flex(space-between);
-      align-items: center;
-      margin-top: 20px;
+    }
+    .login-forget_password {
+      text-align: right;
+      color: #4882f0;
+      font-size: 14px;
+      margin-top: 12px;
     }
   }
-  .login-btn{
+
+  .login-register{
+    position: absolute;
     width: 100%;
-    margin-top: 30px;
-    .el-button--primary{
-      width: 100%;
-    }
-    .el-button--medium{
-      padding: 12px 20px
+    bottom: 20px;
+    font-size: 14px;
+    text-align: center;
+    span{
+      color: #4882f0;
     }
   }
 }

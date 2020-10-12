@@ -1,11 +1,12 @@
 import Vue from 'vue'
-import ElementUI from 'element-ui';
-import 'element-ui/lib/theme-chalk/index.css';
 import App from './App.vue'
 import router from './router/index'
+import Vant from 'vant';
+
+import 'vant/lib/index.css';
 import '../style/reset.scss'
 
-Vue.use(ElementUI);
+Vue.use(Vant);
 
 Vue.config.productionTip = false
 

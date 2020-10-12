@@ -1,120 +1,73 @@
 <template>
   <div class="forget-container">
-    <div class="forget-header"></div>
+    <VHeader :msg="'重置密码'"></VHeader>
+    <div class="forget-header">
+      <div class="forget-header_item forget-header_item_active">
+        验证会员信息
+      </div>
+      <div class="forget-header_item">
+        重置登录密码
+      </div>
+    </div>
     <div class="forget-content">
-      <div class="forget-header">重置密码</div>
-      <div class="forget-label">
-        <div class="forget-label-item"
-            :class="{'forget-label-item-select' : status == 'edit' }">
-          验证会员信息
-        </div>
-        <div class="forget-label-item"
-            :class="{'forget-label-item-select' : status == 'reset' }">重置登录密码</div>
-      </div>
-      <div v-if="status == 'edit'" class="forget-input">
-        <div class="forget-input_item">
-          <div class="forget-input_item_label">登录会员名：</div>
-          <div class="forget-input_item_content forget-input_item_long">
-            <el-input
-              v-model="form.name"
-              placeholder="请输入您的登录会员名"
-            ></el-input>
-          </div>
+      <van-form @submit="onSubmit">
+        <div class="forget-content_item">
+          <van-field
+            v-model="form.name"
+            name="用户名"
+            label="用户名"
+            placeholder="用户名"
+            :rules="[{ required: true, message: '请填写用户名' }]"
+          />
         </div>
 
-        <div class="forget-input_item">
-          <div class="forget-input_item_label">手机号码：</div>
-          <div class="forget-input_item_content forget-input_item_long">
-            <el-input
-              v-model="form.phone"
-              placeholder="请输入注册时绑定的手机号码~"
-            ></el-input>
-          </div>
+        <div class="forget-content_item">
+          <van-field
+            v-model="form.code"
+            type="password"
+            name="密码"
+            label="密码"
+            placeholder="密码"
+            :rules="[{ required: true, message: '请填写密码' }]"
+          />
         </div>
 
-        <div class="forget-input_item">
-          <div class="forget-input_item_label">验证码：</div>
-          <div class="forget-input_item_content forget-input_item_short">
-            <el-input v-model="form.code" placeholder="请输入验证码"></el-input>
-          </div>
-          <div id="forget-verify"></div>
+        <div style="margin: 16px;">
+          <van-button round block type="info" native-type="submit">
+            提交
+          </van-button>
         </div>
-
-        <div class="forget-input_item">
-          <div class="forget-input_item_label">手机验证码：</div>
-          <div class="forget-input_item_content forget-input_item_long">
-            <el-input
-              v-model="form.verifyCode"
-              placeholder="请输入6位验证码"
-            ></el-input>
-          </div>
-          <div class="verify-btn">获取验证码</div>
-        </div>
-
-        <div class="next-btn" @click="toReset">
-          <el-button type="primary" round>下一步</el-button>
-        </div>
-      </div>
-
-      <div v-if="status == 'reset'" class="forget-input">
-
-          <div class="forget-input_item">
-            <div class="forget-input_item_label">设置新的密码：</div>
-            <div class="forget-input_item_content forget-input_item_long">
-              <el-input
-                v-model="resetForm.password"
-                placeholder="请输入您的登录会员名"
-              ></el-input>
-            </div>
-          </div>
-
-          <div class="forget-input_item">
-            <div class="forget-input_item_label">再次输入：</div>
-            <div class="forget-input_item_content forget-input_item_long">
-              <el-input
-                v-model="resetForm.passwordAgain"
-                placeholder="请输入您的登录会员名"
-              ></el-input>
-            </div>
-          </div>
-
-           <div class="next-btn" @click="toReset">
-            <el-button type="primary" round>确认</el-button>
-          </div>
-
-      </div>
-
+      </van-form>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
+import VHeader from "@/components/VHeader.vue"; // @ is an alias to /src
 import GVerify from "@/lib/verify"; // @ is an alias to /src
 
 interface IProps {}
 
 @Component({
   components: {
-    HelloWorld,
+    VHeader,
   },
 })
 export default class Forget extends Vue<IProps> {
-
-  status = "edit"
+  status = "edit";
 
   form = {
-      name: "",
-      phone: "",
-      code: "",
-      verifyCode:""
-  }
+    name: "",
+    phone: "",
+    code: "",
+    verifyCode: "",
+  };
 
   resetForm = {
     password: 123,
-    passwordAgain: 123
-  }
+    passwordAgain: 123,
+  };
 
   beforeCreated() {
     console.log("进入了这里...");
@@ -124,8 +77,13 @@ export default class Forget extends Vue<IProps> {
     var verifyCode = new GVerify("forget-verify");
   }
 
-  toReset(){
-    this.status = "reset"
+  toReset() {
+    this.status = "reset";
+  }
+
+  // 提交的行为
+  onSubmit() {
+    console.log("321123");
   }
 }
 </script>
@@ -144,15 +102,35 @@ export default class Forget extends Vue<IProps> {
 }
 
 .forget-container {
+  // width: 100%;
   .forget-header {
     width: 100%;
-    height: 80px;
+    @include flex(flex-start);
+    .forget-header_item {
+      @include setHeight(40px);
+      font-size: 14px;
+      text-align: center;
+      color: #000;
+      background: #f4f4f4;
+      flex: 1;
+    }
+    .forget-header_item_active {
+      background: #ff9900;
+      color: #fff;
+    }
   }
   .forget-content {
-    width: 960px;
+    width: 100%;
     height: auto;
-    border: 1px solid #ddd;
+    padding: 20px 0px;
     margin: 0 auto;
+
+    .forget-content_item{
+      width: 340px;
+      height: auto;
+      margin: 0 auto;
+    }
+
     .forget-header {
       @include setHeight(50px);
       font-weight: 600;
@@ -187,9 +165,9 @@ export default class Forget extends Vue<IProps> {
         display: inline-block;
         @include flex(flex-start);
 
-        .verify-btn{
+        .verify-btn {
           color: #fff;
-          background: #409EFF;
+          background: #409eff;
           padding: 0px 10px;
           border-radius: 2px;
           margin-left: 20px;
