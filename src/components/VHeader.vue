@@ -4,6 +4,7 @@
     <div class="header-text">
         {{msg}}
     </div>
+    <div v-if="showExitBtn" class="exit-btn">退出登录</div>
   </div>
 </template>
 
@@ -13,6 +14,7 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 @Component
 export default class Header extends Vue {
   @Prop() private msg!: string; // 感叹号表示必选
+  @Prop() private showExitBtn!: boolean; // 感叹号表示必选
 }
 </script>
 
@@ -35,7 +37,9 @@ export default class Header extends Vue {
   padding: 0px 20px;
   background: #f2f2f2;
   @include flex(flex-start);
+  align-items: center;
   margin-bottom: 12px;
+  position: relative;
   .header-logo {
     width: 100px;
     height: 40px;
@@ -46,6 +50,18 @@ export default class Header extends Vue {
   .header-text{
       padding-left: 20px;
       @include setHeight(40px)
+  }
+  .exit-btn{
+    position: absolute;
+    right: 20px;
+    width: 90px;
+    @include setHeight(28px);
+    text-align: center;
+    background: #457ee8;
+    display: block;
+    color: #fff;
+    font-size: 14px;
+    border-radius: 15px;
   }
 }
 </style>

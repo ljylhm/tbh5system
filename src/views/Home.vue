@@ -1,6 +1,113 @@
 <template>
   <div class="home">
-       <van-button type="primary" size="mini">主要按钮</van-button>
+    <VHeader :msg="'首页'" :showExitBtn="true"></VHeader>
+    <VFooter :msg="'首页'"></VFooter>
+    <div class="person-container">
+      <div class="person-container_top">
+        <div class="person-container_avatur">
+          <img src="http://img.baishou123.cn/public/images/nan.png" />
+        </div>
+        <div class="person-container_info">
+          <div>会员账号: 15850225218</div>
+          <div>当前状态: 审核通过</div>
+          <div>支付宝: 1233213213@qq.com</div>
+        </div>
+      </div>
+
+      <div class="person-container_bottom">
+        <div class="person-container_bottom_left">
+          <div>账号余额（元）</div>
+          <div>0.000</div>
+        </div>
+        <div class="person-container_bottom_right">
+          <div>系统工单（0）</div>
+          <div>
+            <van-button type="primary" color="#F90" size="mini"
+              >查看详情</van-button
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="person-icon">
+      <div class="person-icon-left">
+        <div class="icon-comment"></div>
+        <div class="person-icon-text">
+          评价任务
+          <span class="zy-font">(0)</span>
+        </div>
+      </div>
+      <div class="person-icon-right">
+        <div class="cash-comment"></div>
+        <div class="person-icon-text">平台提现</div>
+      </div>
+    </div>
+
+    <div class="person-operation" v-if="!didGetMissioning">
+      <div class="person-oper_btn_1">
+        销量任务
+      </div>
+      <div class="person-oper_content">
+        <div class="person-oper_content_left">
+
+          <div class="person-oper_content_item" :class="{'person-oper_content_item_active': sale_type == 'tb'}" @click="typeSelect('tb')">
+            <span class="person-platform">淘宝</span>
+            <span class="person-text"
+              >接手机会
+              <span class="person-num">6</span>
+            </span>
+          </div>
+
+          <div class="person-oper_content_item person-oper_content_item_active">
+            <span class="person-platform">流量任务</span>
+            <span class="person-text"
+              >接手机会
+              <span class="person-num">6</span>
+            </span>
+          </div>
+        </div>
+        <div class="person-oper_content_right">
+          <div class="person-oper_content_item" :class="{'person-oper_content_item_active': sale_type == 'jd'}" @click="typeSelect('jd')">
+            <span class="person-platform">京东</span>
+            <span class="person-text"
+              >接手机会
+              <span class="person-num">6</span>
+            </span>
+          </div>
+
+          <div class="person-oper_content_item" :class="{'person-oper_content_item_active': sale_type == 'pdd'}" @click="typeSelect('pdd')">
+            <span class="person-platform">拼多多</span>
+            <span class="person-text"
+              >接手机会
+              <span class="person-num">6</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="person-money_container">
+        <div class="person-money_icon">
+        </div> 
+        <div class="person-money_input">
+          <input placeholder="价格上限默认等于信用积分"/>
+        </div>
+      </div>
+
+      <div class="person-oper_btn_2" @click="getMission">
+        接手任务
+      </div>
+
+    </div>
+
+    <div class="person-loading" v-else>
+      <div>等待分配任务</div>
+      <div class="person-loading-icon">
+        <van-loading color="#1989fa"/>
+      </div>
+      <div>排队中，平台正在为你分配任务</div>
+      <div class="person-loading-btn" @click="stopMission">停止接单</div>
+    </div>
   </div>
 </template>
 
@@ -8,14 +115,38 @@
 import { Component, Vue } from "vue-property-decorator";
 import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
 import Header from "@/components/Header.vue"; // @ is an alias to /src
+import VHeader from "@/components/VHeader.vue"; // @ is an alias to /src
+import VFooter from "@/components/VFooter.vue";
 
 @Component({
   components: {
     HelloWorld,
     Header,
+    VHeader,
+    VFooter
   },
 })
-export default class Home extends Vue {}
+export default class Home extends Vue {
+
+    sale_type:string = "tb"
+
+    didGetMissioning:boolean = false
+
+    // 类型选择
+    typeSelect(type:string){
+      this.sale_type = type
+    }
+
+    // 接手任务
+    getMission(){
+      this.didGetMissioning = true
+    }
+
+    stopMission(){
+      this.didGetMissioning = false
+    }
+
+}
 </script>
 
 <style lang="scss">
@@ -36,6 +167,9 @@ export default class Home extends Vue {}
 }
 
 .home {
+  width: 100vw;
+  height: 100vh;
+  background: #f2f2f2;
   .home-banner_container {
     width: 100%;
     height: 400px;
@@ -132,13 +266,239 @@ export default class Home extends Vue {}
               color: #000;
               margin-top: 12px;
               font-size: 14px;
-              &:hover{
+              &:hover {
                 color: #4882f0;
               }
             }
           }
         }
       }
+    }
+  }
+
+  .person-container {
+    .person-container_top {
+      font-size: 14px;
+      box-sizing: border-box;
+      padding: 20px 20px 10px;
+      background: #457ee8;
+      height: auto;
+      position: relative;
+      @include flex(flex-start);
+      align-items: center;
+      .person-container_avatur {
+        width: 80px;
+        height: 80px;
+        & img {
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+        }
+      }
+      .person-container_info {
+        margin-left: 20px;
+        color: #fff;
+        font-size: 14px;
+        font-weight: 600;
+        text-align: left;
+      }
+    }
+
+    .person-container_bottom {
+      width: 100%;
+      @include flex(flex-start);
+      align-items: center;
+      background: #457ee8;
+      border-top: 1px solid #999;
+      & > div {
+        flex: 1;
+        height: 60px;
+      }
+      .person-container_bottom_left {
+        color: #fff;
+        font-weight: 600;
+        font-size: 14px;
+        box-sizing: border-box;
+        padding: 10px;
+        text-align: center;
+        border-right: 1px solid #999;
+      }
+
+      .person-container_bottom_right {
+        color: #fff;
+        font-weight: 600;
+        font-size: 14px;
+        box-sizing: border-box;
+        padding: 10px;
+        text-align: center;
+        border-right: 1px solid #999;
+      }
+    }
+  }
+
+  .person-icon {
+    margin-top: 12px;
+    height: auto;
+    font-size: 14px;
+    background: #fff;
+    border: 1px solid #ddd;
+  
+    @include flex(flex-start);
+    & > div {
+      flex: 1;
+      padding: 20px 0px;
+    }
+    .person-icon-text {
+      margin-top: 6px;
+    }
+    .person-icon-left {
+      border-right: 1px solid #ddd;
+      .icon-comment {
+        width: 45px;
+        height: 45px;
+        margin: 0 auto;
+        background: url("http://img.baishou123.cn/public/wap/img/tu_11.jpg")
+          no-repeat center center;
+        background-size: 100% 100%;
+      }
+    }
+
+    .person-icon-right {
+      .cash-comment {
+        width: 45px;
+        height: 45px;
+        margin: 0 auto;
+        background: url("http://img.baishou123.cn/public/wap/img/tu_22.jpg")
+          no-repeat center center;
+        background-size: 100% 100%;
+      }
+    }
+  }
+
+  .person-operation {
+    margin-top: 10px;
+    box-sizing: border-box;
+    padding: 10px 10px 60px;
+    background: #fff;
+    border: 1px solid #ddd;
+
+    .person-oper_btn_1 {
+      width: 100%;
+      background: #457ee8;
+      padding: 2px 0px;
+      color: #fff;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .person-oper_btn_2 {
+      width: 100%;
+      margin-top: 10px;
+      background: #457ee8;
+      @include setHeight(45px);
+      color: #fff;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .person-oper_content {
+      margin-top: 10px;
+      @include flex(flex-start);
+      & > div {
+        flex: 1;
+      }
+      .person-oper_content_item {
+        @include setHeight(30px);
+        border: 1px dotted #ccc;
+        border-radius: 3px;
+        padding: 0px 5px;
+        display: block;
+        color: #999;
+        font-weight: bold;
+        font-size: 14px;
+        @include flex(space-between);
+        align-items: center;
+        margin-bottom: 10px;
+        .person-num {
+          display: inline-block;
+          padding-left: 10px;
+        }
+      }
+      .person-oper_content_item_active {
+        border: 1px solid #457ee8;
+        font-weight: normal;
+        .person-platform {
+          color: #457ee8;
+        }
+        .person-text {
+          color: #000;
+          display: inline-block;
+          padding-left: 10px;
+        }
+        .person-num {
+          color: red;
+        }
+      }
+
+      .person-oper_content_left {
+        flex: 1;
+        box-sizing: border-box;
+        padding-right: 15px;
+        border-right: 1px solid #ddd;
+      }
+
+      .person-oper_content_right {
+        flex: 1;
+        box-sizing: border-box;
+        padding-left: 15px;
+        border-right: 1px solid #ddd;
+      }
+    }
+
+    .person-money_container{
+      width: 100%;
+      margin-top: 5px;
+      border: 1px dotted #ccc;
+      @include flex(flex-start);
+      @include setHeight(40px);
+      .person-money_icon{
+        width: 40px;
+        height: 40px;
+        background: url(http://img.baishou123.cn/public/wap/images/img/jin_e.gif) no-repeat center center;
+        background-size: 30px 30px;
+      }
+      .person-money_input{
+        flex:1;
+        box-sizing: border-box;
+        // padding: 10px 0px;
+        input{
+          width: 100%;
+          height: 80%;
+          padding:0px 10px;
+           box-sizing: border-box;
+          color: #000;
+          font-size: 14px;
+        }
+      }
+    }
+  }
+
+  .person-loading{
+    padding: 10px 0px 15px;
+    background: #fff;
+    color: #457ee8;
+    font-weight: bold;
+    .person-loading-icon{
+      margin: 5px 0px;
+    }
+    .person-loading-btn{
+      width: 200px;
+      @include setHeight(40px);
+      margin: 12px auto 0px;
+      border-radius: 20px;
+      color: #fff;
+      background: #457ee8;
+      text-align: center;
     }
   }
 }

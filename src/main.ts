@@ -3,7 +3,7 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import ElementUI from 'element-ui';
-import 'lib-flexible/flexible'
+// import 'lib-flexible/flexible'
 import { httpGet } from './lib/http';
 import { setProvinceData } from '@/config/province';
 import { getProvinceNet } from '@/service/province';

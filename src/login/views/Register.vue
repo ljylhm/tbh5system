@@ -36,7 +36,6 @@
             placeholder="验证码"
             :rules="[{ required: true, message: '请填写验证码' }]"
           /></div>
-          <div>123321</div>
         </div>
 
         <div class="forget-content_item">
