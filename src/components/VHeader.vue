@@ -4,17 +4,24 @@
     <div class="header-text">
         {{msg}}
     </div>
-    <div v-if="showExitBtn" class="exit-btn">退出登录</div>
+    <div v-if="showExitBtn" class="exit-btn" @click="logoutAction">退出登录</div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
+import { clearToken } from '@/lib/cache';
 
 @Component
 export default class Header extends Vue {
   @Prop() private msg!: string; // 感叹号表示必选
   @Prop() private showExitBtn!: boolean; // 感叹号表示必选
+
+  logoutAction(){
+   clearToken()
+   const origin = location.origin
+   location.replace(origin + "/login")
+  }
 }
 </script>
 

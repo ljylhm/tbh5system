@@ -29,13 +29,16 @@
         </div>
 
         <div class="forget-content_item">
-          <div><van-field
+          <div class="forget-verify_code"><van-field
             v-model="form.code"
             name="验证码"
             label="验证码"
             placeholder="验证码"
-            :rules="[{ required: true, message: '请填写验证码' }]"
+            :rules="[{ validator: yzmValidator, message: '请填写验证码' }]"
           /></div>
+          <div class="forget-verify_content">
+            {{showRandom}}
+          </div>
         </div>
 
         <div class="forget-content_item">
@@ -44,7 +47,7 @@
             name="手机验证码"
             label="手机验证码"
             placeholder="手机验证码"
-            :rules="[{ required: true, message: '请填写手机验证码' }]"
+            :rules="[{ required: false, message: '请填写手机验证码' }]"
           />
         </div>
 
@@ -54,7 +57,7 @@
             name="qq"
             label="qq"
             placeholder="qq"
-            :rules="[{ required: true, message: '请填写qq' }]"
+            :rules="[{ required: false, message: '请填写qq' }]"
           />
         </div>
 
@@ -71,12 +74,12 @@
 
         <div class="forget-content_item">
           <van-field
-            v-model="form.code_repeate"
+            v-model="form.passwordAgain"
             type="password"
             name="再次输入密码"
             label="再次输入密码"
             placeholder="再次输入密码"
-            :rules="[{ required: true, message: '请再次输入密码' }]"
+            :rules="[{ validator: pasAgainValidator, message: '两次密码不一致' }]"
           />
         </div>
 
@@ -93,7 +96,10 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import VHeader from "@/components/VHeader.vue"; // @ is an alias to /src
+import { register } from '@/service/login';
 import GVerify from "@/lib/verify"; // @ is an alias to /src
+import { setToken } from '@/lib/cache';
+import { Toast } from 'vant';
 
 interface IProps {}
 
@@ -108,8 +114,11 @@ export default class Forget extends Vue<IProps> {
   form = {
     name: "",
     phone: "",
+    password: "",
+    passwordAgain:"",
     code: "",
     verifyCode: "",
+    type: 0
   };
 
   resetForm = {
@@ -117,21 +126,64 @@ export default class Forget extends Vue<IProps> {
     passwordAgain: 123,
   };
 
+  showRandom = ""
+
   beforeCreated() {
-    console.log("进入了这里...");
+    
   }
 
   mounted() {
     var verifyCode = new GVerify("forget-verify");
+    this.renewRandom()
+  }
+
+  pasAgainValidator(val:string){
+    return !!(val && val == this.form.password)
+  }
+
+  yzmValidator(val:string){
+    return val == this.showRandom
+  }
+
+  generateRandomStr(){
+    const num_arr = "0123456789abcdefghijklmnopqrstuvwxyz"
+    const res_arr:string[] = []
+    while(res_arr.length < 4){
+       const t =  Math.floor(Math.random()*(num_arr.length - 1));
+       const val = num_arr[t]
+      if(!res_arr.includes(val)) res_arr.push(val)
+    }
+    return res_arr.join("")
+  }
+
+  renewRandom(){
+    this.showRandom = this.generateRandomStr()
   }
 
   toReset() {
     this.status = "reset";
   }
 
+  doRegister(){
+    register(this.form).then(data=>{
+      if(data && data.data && data.data.access_token){
+        const access_token = data.data.access_token
+        Toast.success({
+          message:"恭喜您注册成功",
+          onClose(){
+             setToken(access_token)
+              const origin = location.origin
+              window.location.replace(origin)
+          }
+        })
+      }
+    })
+  }
+
   // 提交的行为
   onSubmit() {
-    console.log("321123");
+    console.log("进入到正常节奏")
+    this.doRegister()
   }
 }
 </script>
@@ -177,6 +229,8 @@ export default class Forget extends Vue<IProps> {
       width: 340px;
       height: auto;
       margin: 0 auto;
+      @include flex(flex-start);
+      align-items: center;
     }
 
     .forget-header {
@@ -255,6 +309,18 @@ export default class Forget extends Vue<IProps> {
         }
       }
     }
+  }
+
+  .forget-verify_code{
+    width: 260px;
+  }
+  .forget-verify_content{
+    flex: 1;
+    @include setHeight(30px);
+    letter-spacing: 4px;
+    text-align: center;
+    color:cornflowerblue;
+    border: 2px solid #999;
   }
 }
 </style>

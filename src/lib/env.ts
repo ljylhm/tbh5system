@@ -1,6 +1,6 @@
 // 获取当前的开发环境
 
-const DEVELOP = "develop"
+const DEVELOP = "development"
 const PRODUCTION = "production"
 
 export const getEnv = () => process.env.NODE_ENV

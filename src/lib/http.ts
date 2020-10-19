@@ -2,10 +2,20 @@
 import axios, { AxiosResponse } from "axios"
 import { isDev } from "@/lib/env"
 import { showLoading,openAlertError } from "@/lib/notice"
+import { Toast } from 'vant';
 import { ElLoadingComponent } from 'element-ui/types/loading'
+import { getToken } from './cache'
+import { VanToast } from 'vant/types/toast';
 
-const site_url = isDev() ? "" : ""
-const STATUS_SUCCESS = 0
+
+// http://129.211.87.79
+
+const access_token = getToken()
+
+export const TB_DOMAIN = "http://129.211.87.79"
+
+const site_url = isDev() ? "" : TB_DOMAIN
+const STATUS_SUCCESS = 1001
 
 interface IParam{
     [key: string]: any
@@ -23,14 +33,17 @@ interface IRes<T = any>{
     origin_data: IProtocol<T>
 }
 
-let loadingIns:ElLoadingComponent
+let loadingIns:VanToast
 const closeLoading = () => {
-    if(loadingIns && loadingIns.close) loadingIns.close()
+    if(loadingIns && loadingIns.clear) loadingIns.clear()
 }
 
 // 添加请求拦截器
 axios.interceptors.request.use(function (config) {
-    loadingIns = showLoading()
+    loadingIns = Toast.loading({
+        message: '加载中...',
+        forbidClick: false,
+    }); 
     return config;
   }, function (error) {
     return Promise.reject(error);
@@ -53,28 +66,51 @@ const afterResponse = <T>(data:AxiosResponse<IProtocol<T>>):IRes<T> =>{
                 origin_data:Data
             }
         }
-        openAlertError(Data.msg || "异常错误")
         return ResError
     }
     return ResError
 }
 // 异常错误处理
-const afterCatch = ()=>{
+const afterCatch = (err:any)=>{
     closeLoading()
+    console.log("err err",err)
     openAlertError("异常错误")
 }
 
 export const httpGet = <T>(url:string,params:IParam = {},options:IParam = {}) => {
     return axios.get<IProtocol<T>>(site_url + url,{
-        params,
-        ...options
+        params:{
+            ...params,
+            token:access_token
+        },
+        headers:{
+            "Accept": "application/prs.myapp.v1+json",
+            "content-type": "application/x-www-form-urlencoded",
+            ...options
+        }
     }).then(afterResponse)
     .catch(afterCatch)
 }
 
 export const httpPost = <T>(url:string,params:IParam = {},options:IParam = {}) => {
-    return axios.post<IProtocol<T>>(site_url + url, params,{
-        ...options
+    console.log("post的地址",site_url+url)
+    return axios.post<IProtocol<T>>(site_url + url + `?token=${access_token}`, params,{
+        headers:{
+            "Accept": "application/prs.myapp.v1+json",
+            ...options
+        }
     }).then(afterResponse)
     .catch(afterCatch)
+}
+
+export const httpGetCommon = <T>(url:string,params:IParam = {},options:IParam = {}) => {
+    return axios.get<IProtocol<T>>(url,{
+        params:{
+            ...params
+        },
+        headers:{
+            "content-type": "application/x-www-form-urlencoded",
+            ...options
+        }
+    }).catch(afterCatch)
 }

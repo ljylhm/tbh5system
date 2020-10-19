@@ -18,11 +18,11 @@ module.exports = {
         open: true,
         proxy: {
             '/api/*': {
-                target: 'https://platform.smm.cn',
+                target: 'http://129.211.87.79/api',
                 secure: false,
                 changeOrigin: true,
-                pathRewrite: {
-                    '^/api': ''
+                pathRewrite:{
+                    '^/api':''
                 }
             }
         }

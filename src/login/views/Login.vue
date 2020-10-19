@@ -9,19 +9,20 @@
         <van-field
           v-model="form.password"
           label="密码"
+          type="password"
           placeholder="请输入密码"
         />
       </van-cell-group>
     </div>
 
     <div class="login-btn">
-      <van-button type="info" size="small">登录</van-button>
+      <van-button type="info" size="small" @click="toLogin">登录</van-button>
       <div class="login-forget_password">忘记密码</div>
     </div>
 
     <div class="login-register">
       没有账号？
-      <span @click="toRegister">去登录</span>
+      <span @click="toRegister">去注册</span>
     </div>
   </div>
 </template>
@@ -30,6 +31,9 @@
 import { Component, Vue } from "vue-property-decorator";
 import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
 import { routerHelper } from "@/login/router";
+import { login } from '@/service/login';
+import { Toast } from 'vant';
+import { getLastPath, setToken } from '@/lib/cache';
 
 interface IProps {}
 
@@ -54,6 +58,40 @@ export default class Login extends Vue<IProps> {
 
   beforeCreated() {
     console.log("进入了这里...");
+  }
+
+  // 登录方法
+  toLogin(){
+    const { user, password } = this.form
+    if(!user){
+      Toast("请输入用户名")
+      return
+    }
+    if(!password){
+      Toast("请输入密码")
+      return
+    }
+
+    login(user, password).then((data) => {
+      if (data && data.data && data.data.access_token) {
+        const access_token = data.data.access_token;
+        Toast.success({
+          message: "登录成功",
+          duration:500,
+          onClose(){
+            const last_path = getLastPath();
+            setToken(access_token);
+            if (last_path) {
+              location.replace(last_path)
+            } else {
+              const origin = location.origin;
+              window.location.replace(origin);
+            }
+          }
+        })
+
+      }
+    })
   }
 }
 </script>
