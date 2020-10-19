@@ -40,6 +40,7 @@ export default class Header extends Vue {
     @include flex(flex-start);
     & > div{
         flex:1;
+        text-align: center;
         background: rgb(72, 130, 240);
         color: #fff;
     }
