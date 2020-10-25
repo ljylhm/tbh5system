@@ -6,16 +6,16 @@
         <div class="create-account-item">
           <div class="create-account-item_label">会员名：</div>
           <div class="create-account-item_input">
-            <input placeholder="请输入拼多多会员名" />
+            <input :placeholder="`请输入${platName}会员名`" v-model="form.name" />
           </div>
         </div>
 
         <div class="create-account-item">
           <div class="create-account-item_label">性别：</div>
           <div class="create-account-item_input">
-            <van-radio-group v-model="showSexSheet" direction="horizontal">
-              <van-radio name="1">男</van-radio>
-              <van-radio name="2">女</van-radio>
+            <van-radio-group v-model="form.sex" direction="horizontal">
+              <van-radio name="0">男</van-radio>
+              <van-radio name="1">女</van-radio>
             </van-radio-group>
           </div>
         </div>
@@ -27,11 +27,12 @@
             <van-uploader
               v-model="fileList"
               :deletable="false"
-              :after-read="afterRead"
+              :after-read="uploadTb"
+              :max-count="1" 
             />
             <div
               class="create-account-image_pic"
-              @click="previewImage(preview_one)"
+              @click="previewImage(form.img_url[0])"
             >
               <img :src="preview_one" />
             </div>
@@ -43,13 +44,14 @@
           <p>请按照下方右侧示例图模板上传正确图片</p>
           <div class="create-account-image_content">
             <van-uploader
-              v-model="fileList"
+              v-model="fileList1"
               :deletable="false"
-              :after-read="afterRead"
+              :after-read="uploadJd"
+              :max-count="1" 
             />
             <div
               class="create-account-image_pic"
-              @click="previewImage(preview_two)"
+              @click="previewImage(form.img_url[1])"
             >
               <img :src="preview_two" />
             </div>
@@ -61,13 +63,14 @@
           <p>请按照下方右侧示例图模板上传正确图片</p>
           <div class="create-account-image_content">
             <van-uploader
-              v-model="fileList"
+              v-model="fileList2"
               :deletable="false"
-              :after-read="afterRead"
+              :after-read="uploadPdd"
+              :max-count="1"
             />
             <div
               class="create-account-image_pic"
-              @click="previewImage(preview_three)"
+              @click="previewImage(form.img_url[2])"
             >
               <img :src="preview_three" />
             </div>
@@ -75,7 +78,7 @@
         </div>
 
         <div class="create-account-operation">
-          <div class="create-account_btn create-account_btn_1">确定提交</div>
+          <div class="create-account_btn create-account_btn_1" @click="save">确定提交</div>
           <div class="create-account_btn create-account_btn_2">返回</div>
         </div>
       </div>
@@ -89,7 +92,12 @@ import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
 import Header from "@/components/Header.vue"; // @ is an alias to /src
 import VHeader from "@/components/VHeader.vue"; // @ is an alias to /src
 import VFooter from "@/components/VFooter.vue";
-import { ImagePreview } from "vant";
+import { ImagePreview, Toast } from "vant";
+import { upLoadImage } from "@/lib/uploadImage";
+import { routerHelper } from "@/router";
+import { completeImgUrl } from '@/lib/helper';
+import { addBuyer } from '@/service/buyer';
+import { openAlertError } from '@/lib/notice';
 
 @Component({
   components: {
@@ -101,10 +109,11 @@ import { ImagePreview } from "vant";
 })
 export default class Home extends Vue {
   showSexSheet: boolean = false;
+  platType: any = 1;
 
   actions = [
-    { name: "男", value: "1" },
-    { name: "女", value: "2" },
+    { name: "男", value: "0" },
+    { name: "女", value: "1" },
   ];
 
   preview_one: string =
@@ -114,11 +123,69 @@ export default class Home extends Vue {
   preview_three: string =
     "http://img.baishou123.cn/public/home/images/pddmaihao3.png";
 
-  fileList = [
-    {
-      url: "https://img.yzcdn.cn/vant/leaf.jpg",
-    },
-  ];
+  fileList = [];
+  fileList1 = [];
+  fileList2 = [];
+
+  form:{
+    name: string
+    type: number
+    sex: string
+    img_url: string[]
+  } = {
+    name: "",
+    type: 1,
+    sex: "0",
+    img_url: [],
+  };
+
+  img_one = ""
+  img_two = ""
+  img_three = ""
+
+  created() {
+    // 获取传过来的type
+    const { type } = routerHelper.getData();
+    this.platType = type;
+    (this.form as any).type = type;
+    console.log("获取的传过来的type", type);
+  }
+
+  uploadTb(file:any){
+    console.log("xxx",file.file)
+    this.upLoadImageAction(file.file,0)
+  }
+
+  uploadJd(file:any){
+    this.upLoadImageAction(file.file,1)
+  }
+
+  uploadPdd(file:any){
+    this.upLoadImageAction(file.file,2)
+  }
+
+  upLoadImageAction(file:File,index:number) {
+    upLoadImage(file).then((res) => {
+      if (res && res.data) {
+        this.form.img_url[index] = completeImgUrl(res.data.src);
+        if(index == 0){
+          this.img_one = completeImgUrl(res.data.src);
+        }else if(index == 1){
+          this.img_two = completeImgUrl(res.data.src);
+        }else {
+          this.img_three = completeImgUrl(res.data.src);
+        }
+        
+        console.log("index", this.form.img_url)
+      }
+    });
+  }
+
+  get platName() {
+    if (this.platType == 1) return "淘宝";
+    if (this.platType == 2) return "京东";
+    if (this.platType == 3) return "拼多多";
+  }
 
   openSexSheet() {
     this.showSexSheet = true;
@@ -128,11 +195,33 @@ export default class Home extends Vue {
     this.showSexSheet = false;
   }
 
-  afterRead() {}
+  afterRead(data: any) {
+    console.log("data data", data);
+  }
+
+  // 上传图片
+  upLoadImage() {}
 
   previewImage(pic_url: string) {
     ImagePreview([pic_url]);
   }
+
+  // 保存用户的行为
+  save(){
+    if(!this.form.name){
+      Toast("请输入用户名~")
+    }else if(this.form.img_url.length <= 0){
+      Toast("请上传截图")
+    }else{
+      addBuyer(this.form).then(data => {
+        if(data && data.origin_data && data.origin_data.code == 1001 ){
+          Toast.success("保存成功")
+          routerHelper.to("/AccountManage")
+        }
+      })
+    }
+  }
+
 }
 </script>
 

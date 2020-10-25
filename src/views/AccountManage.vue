@@ -9,7 +9,7 @@
         <div>买号：<span style="color:#000">钢铁侠</span></div>
       </div>
       <div class="buyer-item_right">
-        <div class="buyer-item_btn">添加</div>
+        <div class="buyer-item_btn" @click="toCreateAccount(1)">添加</div>
       </div>
     </div>
 
@@ -20,7 +20,7 @@
         <div>买号：<span style="color:#000">钢铁侠</span></div>
       </div>
       <div class="buyer-item_right">
-        <div class="buyer-item_btn">添加</div>
+        <div class="buyer-item_btn" @click="toCreateAccount">添加</div>
       </div>
     </div>
 
@@ -31,7 +31,7 @@
         <div>买号：<span style="color:#000">钢铁侠</span></div>
       </div>
       <div class="buyer-item_right">
-        <div class="buyer-item_btn">添加</div>
+        <div class="buyer-item_btn" @click="toCreateAccount">添加</div>
       </div>
     </div>
 
@@ -68,6 +68,8 @@ import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
 import Header from "@/components/Header.vue"; // @ is an alias to /src
 import VHeader from "@/components/VHeader.vue"; // @ is an alias to /src
 import VFooter from "@/components/VFooter.vue";
+import { getBuyerList } from "@/service/buyer"
+import { routerHelper } from '@/router';
 
 @Component({
   components: {
@@ -77,7 +79,35 @@ import VFooter from "@/components/VFooter.vue";
     VFooter,
   },
 })
-export default class Home extends Vue {}
+export default class Home extends Vue {
+  created(){
+    this.getBuyerInfo()
+  }
+
+  form = {
+    type: 1,
+    sex: 0,
+    img_url:""
+  }
+
+  // 跳到创建买手号网页
+  toCreateAccount(type:number){
+    routerHelper.to("/createAccount",{
+      type
+    })
+  }
+
+  // 获取买手信息
+  getBuyerInfo(){
+    getBuyerList().then(data=>{
+      if(data){
+        console.log("获取用户信息的接口",data)
+      }
+    })
+  }
+
+
+}
 </script>
 
 <style lang="scss">
