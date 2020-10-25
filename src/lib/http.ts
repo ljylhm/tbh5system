@@ -65,6 +65,8 @@ const afterResponse = <T>(data:AxiosResponse<IProtocol<T>>):IRes<T> =>{
                 data: Data.data,
                 origin_data:Data
             }
+        }else{
+            Toast(Data.msg || "异常错误")
         }
         return ResError
     }
@@ -74,7 +76,8 @@ const afterResponse = <T>(data:AxiosResponse<IProtocol<T>>):IRes<T> =>{
 const afterCatch = (err:any)=>{
     closeLoading()
     console.log("err err",err)
-    openAlertError("异常错误")
+    // openAlertError("异常错误")
+    Toast("异常错误")
 }
 
 export const httpGet = <T>(url:string,params:IParam = {},options:IParam = {}) => {

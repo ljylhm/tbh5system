@@ -2,18 +2,24 @@
   <div class="footer-container">
     <div class="footer-item" :class='{"footer-item_active": msg == "首页"}'>首页</div>
     <div class="footer-item" :class='{"footer-item_active": msg == "接手管理"}'>接手管理</div>
-    <div class="footer-item" :class='{"footer-item_active": msg == "买号管理"}'>买号管理</div>
+    <div class="footer-item" :class='{"footer-item_active": msg == "买号管理"}' @click="toPage('/accountManage')">买号管理</div>
     <div class="footer-item" :class='{"footer-item_active": msg == "资金管理"}'>资金管理</div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
+import { routerHelper } from '@/router/index';
 
 @Component
 export default class Header extends Vue {
   @Prop() private msg!: string; // 感叹号表示必选
   @Prop() private showExitBtn!: boolean; // 感叹号表示必选
+
+  toPage(path:string){
+    routerHelper.to(path)
+  }
+
 }
 </script>
 

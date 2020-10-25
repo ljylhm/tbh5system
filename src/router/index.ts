@@ -4,6 +4,7 @@ import Home from '../views/Home.vue'
 import AccountManage from '@/views/AccountManage.vue'
 import CreateAccount from '@/views/CreateAccount.vue'
 import CashManage from '@/views/CashManage.vue'
+import RouterHelper from '@/lib/router'
 
 Vue.use(VueRouter)
 
@@ -42,8 +43,17 @@ const routes: Array<RouteConfig> = [
   }
 ]
 
+
+
 const router = new VueRouter({
   routes
 })
+
+const routerHelper = new RouterHelper(router)
+
+export {
+    routerHelper
+}
+
 
 export default router
