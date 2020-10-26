@@ -5,33 +5,39 @@
     <div class="buyer-item">
       <div class="buyer-item_left"></div>
       <div class="buyer-item_middle">
-        <div>淘宝：<span class="zy-font">审核通过</span></div>
-        <div>买号：<span style="color:#000">钢铁侠</span></div>
+        <div>淘宝：<span class="zy-font">{{
+          checkForPlatType(tbInfo.status)
+        }}</span></div>
+        <div>买号：<span style="color:#000">{{tbInfo.name || "--"}}</span></div>
       </div>
       <div class="buyer-item_right">
-        <div class="buyer-item_btn" @click="toCreateAccount(1)">添加</div>
+        <div v-if="!tbInfo.id" class="buyer-item_btn" @click="toCreateAccount(1)">添加</div>
       </div>
     </div>
 
     <div class="buyer-item">
       <div class="buyer-item_left buyer-item_left_jd"></div>
-      <div class="buyer-item_middle">
-        <div>淘宝：<span class="zy-font">审核通过</span></div>
-        <div>买号：<span style="color:#000">钢铁侠</span></div>
+       <div class="buyer-item_middle">
+        <div>京东：<span class="zy-font">{{
+          checkForPlatType(tbInfo.status)
+        }}</span></div>
+        <div>买号：<span style="color:#000">{{jdInfo.name || "--"}}</span></div>
       </div>
       <div class="buyer-item_right">
-        <div class="buyer-item_btn" @click="toCreateAccount">添加</div>
+        <div v-if="!jdInfo.id" class="buyer-item_btn" @click="toCreateAccount(2)">添加</div>
       </div>
     </div>
 
     <div class="buyer-item">
       <div class="buyer-item_left buyer-item_left_common"></div>
       <div class="buyer-item_middle">
-        <div>拼多多：<span class="zy-font">审核通过</span></div>
-        <div>买号：<span style="color:#000">钢铁侠</span></div>
+        <div>拼多多：<span class="zy-font">{{
+          checkForPlatType(pddInfo.status)
+        }}</span></div>
+        <div>买号：<span style="color:#000">{{pddInfo.name || "--"}}</span></div>
       </div>
       <div class="buyer-item_right">
-        <div class="buyer-item_btn" @click="toCreateAccount">添加</div>
+        <div v-if="!pddInfo.id" class="buyer-item_btn" @click="toCreateAccount(3)">添加</div>
       </div>
     </div>
 
@@ -68,7 +74,7 @@ import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
 import Header from "@/components/Header.vue"; // @ is an alias to /src
 import VHeader from "@/components/VHeader.vue"; // @ is an alias to /src
 import VFooter from "@/components/VFooter.vue";
-import { getBuyerList } from "@/service/buyer"
+import { getBuyerList,IBuyerInfo,DEFAULT_BUYERINFO } from "@/service/buyer"
 import { routerHelper } from '@/router';
 
 @Component({
@@ -90,6 +96,12 @@ export default class Home extends Vue {
     img_url:""
   }
 
+  buyerInfo:IBuyerInfo[] = []
+
+  tbInfo:IBuyerInfo = Object.assign({},DEFAULT_BUYERINFO) 
+  jdInfo:IBuyerInfo = Object.assign({},DEFAULT_BUYERINFO) 
+  pddInfo:IBuyerInfo = Object.assign({},DEFAULT_BUYERINFO) 
+
   // 跳到创建买手号网页
   toCreateAccount(type:number){
     routerHelper.to("/createAccount",{
@@ -97,11 +109,21 @@ export default class Home extends Vue {
     })
   }
 
+  checkForPlatType(status:number){
+      if(status == 0) return "审核中"
+      if(status == 1) return "审核通过"
+  }
+
   // 获取买手信息
   getBuyerInfo(){
     getBuyerList().then(data=>{
-      if(data){
-        console.log("获取用户信息的接口",data)
+      if(data && data.data && data.data.length > 0){
+        const buy_data = data.data
+        buy_data.forEach(item=>{
+          if(item.id && item.type == 1) this.tbInfo = item
+          if(item.id && item.type == 2) this.jdInfo = item
+          if(item.id && item.type == 3) this.pddInfo = item
+        })
       }
     })
   }
