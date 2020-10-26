@@ -6,7 +6,7 @@
     <div class="footer-item" :class='{"footer-item_active": msg == "资金管理"}' @click="toPage('/cashManage')">资金管理</div>
   </div>
 </template>
-
+ 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { routerHelper } from '@/router/index';
