@@ -187,11 +187,22 @@ export default class Home extends Vue {
   jdBuyerInfo: any = {};
   pddBuyerInfo: any = {};
 
+  buyerInfo:IBuyerInfo[] = []
+
+  tbInfo:IBuyerInfo = Object.assign({},DEFAULT_BUYERINFO) 
+  jdInfo:IBuyerInfo = Object.assign({},DEFAULT_BUYERINFO) 
+  pddInfo:IBuyerInfo = Object.assign({},DEFAULT_BUYERINFO) 
+
   // 跳到创建买手号网页
   toCreateAccount(type: number) {
     routerHelper.to("/createAccount", {
       type,
     });
+  }
+
+  checkForPlatType(status:number){
+      if(status == 0) return "审核中"
+      if(status == 1) return "审核通过"
   }
 
   // 获取买手信息
