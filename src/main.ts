@@ -32,13 +32,14 @@ router.beforeEach((to,from,next)=>{
     const origin = location.origin
     const url = location.href
     setLastPath(url)
-    Toast({
-      message:"请先登录或注册",
-      onClose(){
-        location.href = origin + "/login" 
-      },
-      duration:2000
-    })
+    location.href = origin + "/login" 
+    // Toast({
+    //   message:"请先登录或注册",
+    //   onClose(){
+       
+    //   },
+    //   duration:2000
+    // })
   }
 
   next()

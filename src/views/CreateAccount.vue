@@ -32,7 +32,7 @@
             />
             <div
               class="create-account-image_pic"
-              @click="previewImage(form.img_url[0])"
+              @click="previewImage(preview_one)"
             >
               <img :src="preview_one" />
             </div>
@@ -51,7 +51,7 @@
             />
             <div
               class="create-account-image_pic"
-              @click="previewImage(form.img_url[1])"
+              @click="previewImage(preview_two)"
             >
               <img :src="preview_two" />
             </div>
@@ -70,7 +70,7 @@
             />
             <div
               class="create-account-image_pic"
-              @click="previewImage(form.img_url[2])"
+              @click="previewImage(preview_three)"
             >
               <img :src="preview_three" />
             </div>
@@ -79,7 +79,7 @@
 
         <div class="create-account-operation">
           <div class="create-account_btn create-account_btn_1" @click="save">确定提交</div>
-          <div class="create-account_btn create-account_btn_2">返回</div>
+          <div class="create-account_btn create-account_btn_2" @click="toNext">返回</div>
         </div>
       </div>
     </div>
@@ -98,6 +98,7 @@ import { routerHelper } from "@/router";
 import { completeImgUrl } from '@/lib/helper';
 import { addBuyer } from '@/service/buyer';
 import { openAlertError } from '@/lib/notice';
+import { getUserInfo } from '@/service/login';
 
 @Component({
   components: {
@@ -148,6 +149,12 @@ export default class Home extends Vue {
     const { type } = routerHelper.getData();
     this.platType = type;
     (this.form as any).type = type;
+
+    if(type == "2"){
+      this.preview_one = "https://imgqn.smm.cn/production/b/image/NMzSJ20201124221026.png"
+      this.preview_two = "https://imgqn.smm.cn/production/b/image/PCeVe20201124221225.png"
+      this.preview_one = "https://imgqn.smm.cn/production/b/image/wbcLS20201124221246.png"
+    }
     console.log("获取的传过来的type", type);
   }
 
@@ -204,6 +211,10 @@ export default class Home extends Vue {
 
   previewImage(pic_url: string) {
     ImagePreview([pic_url]);
+  }
+
+  toNext(){
+    routerHelper.to("/accountManage")
   }
 
   // 保存用户的行为

@@ -5,24 +5,32 @@
     <div class="person-container">
       <div class="person-container_top">
         <div class="person-container_avatur">
-          <img src="http://img.baishou123.cn/public/images/nan.png" />
+          <img
+            src="https://imgqn.smm.cn/production/b/image/CiIiL20201211113642.png"
+          />
         </div>
         <div class="person-container_info">
-          <div>会员账号: 15850225218</div>
-          <div>当前状态: 审核通过</div>
-          <div>支付宝: 1233213213@qq.com</div>
+          <div>会员账号: {{ userData.name }}</div>
+          <div>
+            当前状态: {{ userData.status == 0 ? "待审核" : "审核通过" }}
+          </div>
+          <div>支付宝: {{ userData.nick || "--" }}</div>
         </div>
       </div>
 
       <div class="person-container_bottom">
         <div class="person-container_bottom_left">
           <div>账号余额（元）</div>
-          <div>0.000</div>
+          <div>{{ userData.amount }}元</div>
         </div>
         <div class="person-container_bottom_right">
           <div>系统工单（0）</div>
           <div>
-            <van-button type="primary" color="#F90" size="mini"
+            <van-button
+              type="primary"
+              color="#F90"
+              size="mini"
+              @click="toWorkOrderList"
               >查看详情</van-button
             >
           </div>
@@ -31,31 +39,32 @@
     </div>
 
     <div class="person-icon">
-      <div class="person-icon-left">
+      <div class="person-icon-left" @click="toComment">
         <div class="icon-comment"></div>
         <div class="person-icon-text">
           评价任务
-          <span class="zy-font">(0)</span>
+          <span class="zy-font">({{ commentCount }})</span>
         </div>
       </div>
-      <div class="person-icon-right">
+      <div class="person-icon-right" @click="toTx">
         <div class="cash-comment"></div>
         <div class="person-icon-text">平台提现</div>
       </div>
     </div>
 
     <div class="person-operation" v-if="!didGetMissioning">
-      <div class="person-oper_btn_1">
-        销量任务
-      </div>
+      <div class="person-oper_btn_1">销量任务</div>
       <div class="person-oper_content">
         <div class="person-oper_content_left">
-
-          <div class="person-oper_content_item" :class="{'person-oper_content_item_active': sale_type == 'tb'}" @click="typeSelect('tb')">
+          <div
+            class="person-oper_content_item"
+            :class="{ 'person-oper_content_item_active': sale_type == 'tb' }"
+            @click="typeSelect('tb')"
+          >
             <span class="person-platform">淘宝</span>
             <span class="person-text"
               >接手机会
-              <span class="person-num">6</span>
+              <span class="person-num">{{ orderCount }}</span>
             </span>
           </div>
 
@@ -63,47 +72,51 @@
             <span class="person-platform">流量任务</span>
             <span class="person-text"
               >接手机会
-              <span class="person-num">6</span>
+              <span class="person-num">{{ orderCount }}</span>
             </span>
           </div>
         </div>
         <div class="person-oper_content_right">
-          <div class="person-oper_content_item" :class="{'person-oper_content_item_active': sale_type == 'jd'}" @click="typeSelect('jd')">
+          <div
+            class="person-oper_content_item"
+            :class="{ 'person-oper_content_item_active': sale_type == 'jd' }"
+            @click="typeSelect('jd')"
+          >
             <span class="person-platform">京东</span>
             <span class="person-text"
               >接手机会
-              <span class="person-num">6</span>
+              <span class="person-num">{{ orderCount }}</span>
             </span>
           </div>
 
-          <div class="person-oper_content_item" :class="{'person-oper_content_item_active': sale_type == 'pdd'}" @click="typeSelect('pdd')">
+          <div
+            class="person-oper_content_item"
+            :class="{ 'person-oper_content_item_active': sale_type == 'pdd' }"
+            @click="typeSelect('pdd')"
+          >
             <span class="person-platform">拼多多</span>
             <span class="person-text"
               >接手机会
-              <span class="person-num">6</span>
+              <span class="person-num">{{ orderCount }}</span>
             </span>
           </div>
         </div>
       </div>
 
       <div class="person-money_container">
-        <div class="person-money_icon">
-        </div> 
+        <div class="person-money_icon"></div>
         <div class="person-money_input">
-          <input placeholder="价格上限默认等于信用积分"/>
+          <input placeholder="价格上限默认等于信用积分" />
         </div>
       </div>
 
-      <div class="person-oper_btn_2" @click="getMission">
-        接手任务
-      </div>
-
+      <div class="person-oper_btn_2" @click="getMission">接手任务</div>
     </div>
 
     <div class="person-loading" v-else>
       <div>等待分配任务</div>
       <div class="person-loading-icon">
-        <van-loading color="#1989fa"/>
+        <van-loading color="#1989fa" />
       </div>
       <div>排队中，平台正在为你分配任务</div>
       <div class="person-loading-btn" @click="stopMission">停止接单</div>
@@ -117,35 +130,162 @@ import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
 import Header from "@/components/Header.vue"; // @ is an alias to /src
 import VHeader from "@/components/VHeader.vue"; // @ is an alias to /src
 import VFooter from "@/components/VFooter.vue";
+import { getBuyerList } from "@/service/buyer";
+import { getCommentList, getUserOrderNum, receiveOrder } from "@/service/order";
+import { getUserInfo } from "@/service/login";
+import { Dialog } from "vant";
+import { Toast } from "vant";
+import { routerHelper } from "@/router";
 
 @Component({
   components: {
     HelloWorld,
     Header,
     VHeader,
-    VFooter
+    VFooter,
   },
 })
 export default class Home extends Vue {
+  sale_type: string = "tb";
 
-    sale_type:string = "tb"
+  didGetMissioning: boolean = false;
 
-    didGetMissioning:boolean = false
+  buyerData: any = [];
+  userData: any = {};
 
-    // 类型选择
-    typeSelect(type:string){
-      this.sale_type = type
+  tbBuyerId: number = 0;
+  jdBuyerId: number = 0;
+  pddBuyerId: number = 0;
+
+  orderCount: any = 0;
+  commentCount: any = 0;
+
+  created() {
+    getCommentList({
+      limit: 10,
+      page: 1,
+      is_evaluate: 1,
+    }).then((data: any) => {
+      console.log("获取评价的数据", data);
+      if (data && data.data && data.data.total) {
+        this.commentCount = data.data.total;
+      }
+    });
+
+    getUserInfo().then((data) => {
+      if (data && data.origin_data && data.origin_data.code == 1001) {
+        this.userData = data.data;
+      }
+    });
+
+    getBuyerList().then((data) => {
+      if (data && data.data && data.data.length > 0) {
+        this.buyerData = data.data;
+        this.buyerData.forEach((item: any) => {
+          if (item.type == 1) this.tbBuyerId = item.id;
+          if (item.type == 2) this.jdBuyerId = item.id;
+          if (item.type == 3) this.pddBuyerId = item.id;
+        });
+      }
+    });
+
+    getUserOrderNum().then((data) => {
+      if (data && data.data) {
+        this.orderCount = data.data;
+      }
+    });
+  }
+
+  // 类型选择
+  typeSelect(type: string) {
+    if (type == "tb" && this.tbBuyerId) this.sale_type = type;
+    if (type == "jd" && this.jdBuyerId) this.sale_type = type;
+    if (type == "pdd" && this.pddBuyerId) this.sale_type = type;
+  }
+
+  private receiveTimer: any = "";
+
+  // 接手任务
+  getMission() {
+    this.didGetMissioning = true;
+    let id = 0;
+    let type = 1;
+    if (this.sale_type == "tb") {
+      id = this.tbBuyerId;
+      type = 1;
     }
 
-    // 接手任务
-    getMission(){
-      this.didGetMissioning = true
+    if (this.sale_type == "jd") {
+      id = this.jdBuyerId;
+      type = 2;
     }
 
-    stopMission(){
-      this.didGetMissioning = false
+    if (this.sale_type == "pdd") {
+      id = this.pddBuyerId;
+      type = 3;
     }
 
+    if (!id) {
+      Toast("请先添加买号~");
+      return;
+    }
+    // this.receiveTimer = setInterval(() => {
+    //   receiveOrder(type, id).then((data) => {
+    //     if (data && data.origin_data && data.origin_data.code == 1001) {
+    //       clearInterval(this.receiveTimer);
+    //       this.stopMission();
+    //       Dialog({
+    //         title: "接单成功",
+    //         message: "恭喜你已经接单成功了",
+    //       });
+    //     }
+    //   });
+    // }, 3000);
+
+    let fn = () => {
+      const timer = setTimeout(() => {
+        clearTimeout(timer);
+        receiveOrder(type, id).then((data) => {
+          if (data && data.origin_data) {
+            if (data.origin_data.code == 1001) {
+              this.stopMission();
+              Dialog({
+                title: "接单成功",
+                message: "恭喜你已经接单成功了",
+              });
+            } else if (data.origin_data.code == 1006) {
+              // fn()
+              this.stopMission();
+            } else {
+              this.stopMission();
+              Toast(data.origin_data.msg || "未知异常");
+            }
+          } else {
+            this.stopMission();
+          }
+        });
+      }, 3000);
+    };
+
+    fn();
+  }
+
+  stopMission() {
+    this.didGetMissioning = false;
+    clearInterval(this.receiveTimer);
+  }
+
+  toTx() {
+    routerHelper.to("/applyPay");
+  }
+
+  toComment() {
+    routerHelper.to("/commentList");
+  }
+
+  toWorkOrderList(){
+    routerHelper.to("/workOrderList");
+  }
 }
 </script>
 
@@ -342,7 +482,7 @@ export default class Home extends Vue {
     font-size: 14px;
     background: #fff;
     border: 1px solid #ddd;
-  
+
     @include flex(flex-start);
     & > div {
       flex: 1;
@@ -357,7 +497,7 @@ export default class Home extends Vue {
         width: 45px;
         height: 45px;
         margin: 0 auto;
-        background: url("http://img.baishou123.cn/public/wap/img/tu_11.jpg")
+        background: url("https://imgqn.smm.cn/production/b/image/GtnnH20201211113833.png")
           no-repeat center center;
         background-size: 100% 100%;
       }
@@ -455,27 +595,28 @@ export default class Home extends Vue {
       }
     }
 
-    .person-money_container{
+    .person-money_container {
       width: 100%;
       margin-top: 5px;
       border: 1px dotted #ccc;
       @include flex(flex-start);
       @include setHeight(40px);
-      .person-money_icon{
+      .person-money_icon {
         width: 40px;
         height: 40px;
-        background: url(http://img.baishou123.cn/public/wap/images/img/jin_e.gif) no-repeat center center;
+        background: url(http://img.baishou123.cn/public/wap/images/img/jin_e.gif)
+          no-repeat center center;
         background-size: 30px 30px;
       }
-      .person-money_input{
-        flex:1;
+      .person-money_input {
+        flex: 1;
         box-sizing: border-box;
         // padding: 10px 0px;
-        input{
+        input {
           width: 100%;
           height: 80%;
-          padding:0px 10px;
-           box-sizing: border-box;
+          padding: 0px 10px;
+          box-sizing: border-box;
           color: #000;
           font-size: 14px;
         }
@@ -483,15 +624,15 @@ export default class Home extends Vue {
     }
   }
 
-  .person-loading{
+  .person-loading {
     padding: 10px 0px 15px;
     background: #fff;
     color: #457ee8;
     font-weight: bold;
-    .person-loading-icon{
+    .person-loading-icon {
       margin: 5px 0px;
     }
-    .person-loading-btn{
+    .person-loading-btn {
       width: 200px;
       @include setHeight(40px);
       margin: 12px auto 0px;

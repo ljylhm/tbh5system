@@ -1,6 +1,6 @@
 <template>
   <div class="login-container">
-    <h2 class="login-text">欢迎来到百手联盟</h2>
+    <h2 class="login-text">欢迎来到权重高</h2>
     <div class="login-bg"></div>
 
     <div class="login-form_container">
@@ -17,7 +17,7 @@
 
     <div class="login-btn">
       <van-button type="info" size="small" @click="toLogin">登录</van-button>
-      <div class="login-forget_password">忘记密码</div>
+      <div class="login-forget_password"  @click="toForget">忘记密码</div>
     </div>
 
     <div class="login-register">

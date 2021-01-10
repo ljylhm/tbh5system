@@ -1,5 +1,5 @@
 // 设置localstorage的方法
-export const AUTH_TOKEN = 'auth_token'
+export const AUTH_TOKEN = 'auth_token_h5'
 export const LAST_PATH = 'login_register_last_path'
 
 export const setCache = (key:string,value:string) => {

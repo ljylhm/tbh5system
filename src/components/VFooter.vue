@@ -1,9 +1,9 @@
 <template>
   <div class="footer-container">
-    <div class="footer-item" :class='{"footer-item_active": msg == "首页"}'>首页</div>
-    <div class="footer-item" :class='{"footer-item_active": msg == "接手管理"}'>接手管理</div>
+    <div class="footer-item" :class='{"footer-item_active": msg == "首页"}' @click="toPage('/')">首页</div>
+    <div class="footer-item" :class='{"footer-item_active": msg == "接手管理"}' @click="toPage('/userOrder')">接手管理</div>
     <div class="footer-item" :class='{"footer-item_active": msg == "买号管理"}' @click="toPage('/accountManage')">买号管理</div>
-    <div class="footer-item" :class='{"footer-item_active": msg == "资金管理"}'>资金管理</div>
+    <div class="footer-item" :class='{"footer-item_active": msg == "资金管理"}' @click="toPage('/cashManage')">资金管理</div>
   </div>
 </template>
 
@@ -38,6 +38,7 @@ export default class Header extends Vue {
 
 .footer-container{
     position: fixed;
+    z-index: 5000;
     font-size: 14px;
     @include setHeight(40px);
     width: 100vw;

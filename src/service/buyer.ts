@@ -4,7 +4,7 @@ import { ILogin, IRegister } from '@/constance/login';
 
 // 获取买手列表
 export const getBuyerList = () => {
-    return httpPost("/api/buyer/get")
+    return httpPost<any>("/api/buyer/get")
 } 
 
 // 添加买手
@@ -16,3 +16,6 @@ export const addBuyer = (form:{
 }) => {
     return httpPost("/api/buyer/add",form)
 }
+
+// 修改用户信息的一些接口
+export const editUserInfo = (editInfo:any) => httpPost("/api/update",editInfo)

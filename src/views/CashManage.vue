@@ -80,44 +80,49 @@
         </div>
 
         <div class="tip-modal-footer">
-          <span style="font-weight:bold">备注</span>：请登录网银确认货款未到账后再向平台反馈。
+          <span style="font-weight: bold">备注</span
+          >：请登录网银确认货款未到账后再向平台反馈。
         </div>
       </div>
     </van-popup>
 
     <div class="cash-tip-top zy-font">手机端只显示最近3天的纪录</div>
     <div class="cash-tip-top">
-      卖家提现须知
+      买家提现须知
       <em class="quest_icon" @click="openWarnModal">?</em>
     </div>
 
     <div class="cash-bank">
       <div class="bank-card_icon"></div>
       <div class="bank-card_content">
-        <p>默认提现银行卡：</p>
+        <p>默认提现银行卡：{{ bankInfo.bank ? bankInfo.bank : "" }}</p>
         <p>
-          中国农业银行 尾号
-          <span class="zy-font">8270</span>
+          尾号
+          <span class="zy-font">{{
+            bankInfo.card_no ? bankInfo.card_no.slice(-4) : ""
+          }}</span>
         </p>
       </div>
       <div class="bank-card_btn">
-        <div @click="openEditBankCardModal">修改</div>
+        <div @click="deleteBank" v-if="bankInfo && bankInfo.id && bankInfo.status == 1">删除</div>
+        <div v-else-if="bankInfo && bankInfo.id && bankInfo.status == 0">审核中</div>
+        <div @click="openEditBankCardModal" v-else>创建</div>
       </div>
     </div>
 
     <div class="cash-record-item">
       <span>收支明细记录</span>
-      <span class="cash-record-right">查看全部</span>
+      <span class="cash-record-right" @click="toMoneyPage">查看全部</span>
     </div>
 
     <div class="cash-record-item">
       <span>卖家提现记录</span>
-      <span class="cash-record-right">查看全部</span>
+      <span class="cash-record-right" @click="toCashOut">查看全部</span>
     </div>
 
     <div class="cash-record-item">
       <span>平台提现</span>
-      <span class="cash-record-right">前往申请</span>
+      <span class="cash-record-right" @click="toApplyPay">前往申请</span>
     </div>
   </div>
 </template>
@@ -128,7 +133,9 @@ import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
 import Header from "@/components/Header.vue"; // @ is an alias to /src
 import VHeader from "@/components/VHeader.vue"; // @ is an alias to /src
 import VFooter from "@/components/VFooter.vue";
-import { ImagePreview } from "vant";
+import { Dialog, ImagePreview, Toast } from "vant";
+import { routerHelper } from "@/router";
+import { getBank,deleteBank } from "@/service/bank";
 
 @Component({
   components: {
@@ -207,20 +214,62 @@ export default class Home extends Vue {
     },
   ];
 
+  bankInfo: any = {};
+
+  mounted() {
+    getBank().then((data: any) => {
+      if (data && data.data && data.data.bank) {
+        this.bankInfo = data.data.bank;
+      }
+    });
+  }
+
+  // 删除银行卡
+  deleteBank() {
+    Dialog.confirm({
+      title: "删除",
+      message: "是否删除当前银行卡",
+    })
+      .then(() => {
+         deleteBank(this.bankInfo.id).then(data=>{
+           if(data && data.origin_data && data.origin_data.code == 1001){
+             Toast("删除成功")
+             location.reload()
+           }
+         })
+      })
+      .catch(() => {
+        // on cancel
+      });
+  }
+
   openEditBankCardModal() {
-    this.showEditBankCardModal = true;
+    routerHelper.to("/bindBank");
+    // this.showEditBankCardModal = true;
   }
 
   closeEditBankCardModal() {
     this.showEditBankCardModal = false;
   }
 
-  openWarnModal(){
-    this.showWarnModal = true
+  openWarnModal() {
+    this.showWarnModal = true;
   }
 
-  closeWarnModal(){
-    this.showWarnModal = false
+  closeWarnModal() {
+    this.showWarnModal = false;
+  }
+
+  toCashOut() {
+    routerHelper.to("/cashOut");
+  }
+
+  toMoneyPage() {
+    routerHelper.to("/chareManage");
+  }
+
+  toApplyPay(){
+    routerHelper.to("/applyPay")
   }
 }
 </script>
@@ -330,6 +379,7 @@ export default class Home extends Vue {
 .tip-modal-container {
   width: 300px;
   height: auto;
+  text-align: left;
   .tip-modal-header {
     width: 100%;
     background: #4882f0;
@@ -391,7 +441,7 @@ export default class Home extends Vue {
 .tip-modal-container-1 {
   width: 300px;
 
-   border: 1px solid #f90;
+  border: 1px solid #f90;
   .tip-modal-header {
     width: 100%;
     color: #999;

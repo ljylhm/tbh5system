@@ -172,8 +172,7 @@
             </template>
 
             <template slot="header">
-              关键字<span class="zy-font space-margin-left-15 under-line"
-                >搜索关键字设置规范</span
+              关键字
               >
             </template>
           </el-table-column>
@@ -262,9 +261,7 @@
               </template>
 
               <template slot="header">
-                关键字<span class="zy-font space-margin-left-15 under-line"
-                  >搜索关键字设置规范</span
-                >
+                关键字
               </template>
             </el-table-column>
 

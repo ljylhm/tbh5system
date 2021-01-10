@@ -16,16 +16,16 @@ module.exports = {
     devServer: {
         port: 4001,
         open: true,
-        proxy: {
-            '/api/*': {
-                target: 'http://129.211.87.79/api',
-                secure: false,
-                changeOrigin: true,
-                pathRewrite:{
-                    '^/api':''
-                }
-            }
-        }
+        // proxy: {
+        //     '/api/*': {
+        //         target: 'http://129.211.87.79/api',
+        //         secure: false,
+        //         changeOrigin: true,
+        //         pathRewrite:{
+        //             '^/api':''
+        //         }
+        //     }
+        // }
     },
 
     lintOnSave: false,

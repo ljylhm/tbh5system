@@ -5,7 +5,8 @@ import { ILogin, IRegister } from '@/constance/login';
 export const login = (phone: string, password: string) => {
     return httpPost<ILogin>("/api/login", {
         phone,
-        password
+        password,
+        type: 0
     })
 }
 
@@ -22,8 +23,29 @@ export const register = (form:any) => {
 }
 
 // 获取用户信息的方法
-export const getUserInfo = (token:string) => { 
-    return httpGet("/api/current",{
-        token
+export const getUserInfo = () => { 
+    return httpGet("/api/current")
+}
+
+// 发送短信的方法
+export const sendMessage = (phone:string) => {
+    return httpGet("/api/sms",{
+        phone,
+        type: 0
+    })
+}
+
+// 发送短信的方法
+export const sendMessageV2 = (phone:string) => {
+    return httpGet("/api/sms_back",{
+        phone,
+        type: 0
+    })
+}
+
+export const resetPassword = (form:any) => {
+    return httpPost("/api/reset_password",{
+        ...form,
+        type: 0
     })
 }

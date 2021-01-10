@@ -29,26 +29,34 @@
         </div>
 
         <div class="forget-content_item">
-          <div class="forget-verify_code"><van-field
-            v-model="form.code"
-            name="验证码"
-            label="验证码"
-            placeholder="验证码"
-            :rules="[{ validator: yzmValidator, message: '请填写验证码' }]"
-          /></div>
-          <div class="forget-verify_content">
-            {{showRandom}}
+          <div class="forget-verify_code">
+            <van-field
+              v-model="form.verifyCode"
+              name="验证码"
+              label="验证码"
+              placeholder="验证码"
+              :rules="[{ validator: yzmValidator, message: '请填写验证码' }]"
+            />
+          </div>
+          <div class="forget-verify_content" @click="renewRandom">
+            {{ showRandom }}
           </div>
         </div>
 
         <div class="forget-content_item">
-          <van-field
-            v-model="form.verifyCode"
-            name="手机验证码"
-            label="手机验证码"
-            placeholder="手机验证码"
-            :rules="[{ required: false, message: '请填写手机验证码' }]"
-          />
+          <div class="forget-verify_code">
+            <van-field
+              v-model="form.code"
+              name="手机验证码"
+              label="手机验证码"
+              placeholder="手机验证码"
+              :rules="[{ required: false, message: '请填写手机验证码' }]"
+            />
+          </div>
+
+          <div class="forget-verify_content_1" @click="getVerifyCode">
+            {{ send_msg }}
+          </div>
         </div>
 
         <div class="forget-content_item">
@@ -61,7 +69,17 @@
           />
         </div>
 
-          <div class="forget-content_item">
+        <div class="forget-content_item">
+          <van-field
+            v-model="form.nick"
+            name="支付宝账号"
+            label="支付宝账号"
+            placeholder="支付宝账号"
+            :rules="[{ required: true, message: '请填写支付宝账号' }]"
+          />
+        </div>
+
+        <div class="forget-content_item">
           <van-field
             v-model="form.password"
             type="password"
@@ -79,11 +97,13 @@
             name="再次输入密码"
             label="再次输入密码"
             placeholder="再次输入密码"
-            :rules="[{ validator: pasAgainValidator, message: '两次密码不一致' }]"
+            :rules="[
+              { validator: pasAgainValidator, message: '两次密码不一致' },
+            ]"
           />
         </div>
 
-        <div style="margin: 16px;">
+        <div style="margin: 16px">
           <van-button round block type="info" native-type="submit">
             注册
           </van-button>
@@ -96,12 +116,14 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import VHeader from "@/components/VHeader.vue"; // @ is an alias to /src
-import { register } from '@/service/login';
+import { register, sendMessage } from "@/service/login";
 import GVerify from "@/lib/verify"; // @ is an alias to /src
-import { setToken } from '@/lib/cache';
-import { Toast } from 'vant';
+import { setToken } from "@/lib/cache";
+import { Toast } from "vant";
 
 interface IProps {}
+
+const phone_rule = /^1[3456789]\d{9}$/;
 
 @Component({
   components: {
@@ -115,10 +137,11 @@ export default class Forget extends Vue<IProps> {
     name: "",
     phone: "",
     password: "",
-    passwordAgain:"",
+    passwordAgain: "",
     code: "",
     verifyCode: "",
-    type: 0
+    type: 0,
+    nick:""
   };
 
   resetForm = {
@@ -126,64 +149,93 @@ export default class Forget extends Vue<IProps> {
     passwordAgain: 123,
   };
 
-  showRandom = ""
+  showRandom = "";
+  send_msg = "获取验证码";
+  sendStatus = 0
 
-  beforeCreated() {
-    
-  }
+  beforeCreated() {}
 
   mounted() {
     var verifyCode = new GVerify("forget-verify");
-    this.renewRandom()
+    this.renewRandom();
   }
 
-  pasAgainValidator(val:string){
-    return !!(val && val == this.form.password)
+  pasAgainValidator(val: string) {
+    return !!(val && val == this.form.password);
   }
 
-  yzmValidator(val:string){
-    return val == this.showRandom
+  yzmValidator(val: string) {
+    return val.toUpperCase() == this.showRandom.toUpperCase();
   }
 
-  generateRandomStr(){
-    const num_arr = "0123456789abcdefghijklmnopqrstuvwxyz"
-    const res_arr:string[] = []
-    while(res_arr.length < 4){
-       const t =  Math.floor(Math.random()*(num_arr.length - 1));
-       const val = num_arr[t]
-      if(!res_arr.includes(val)) res_arr.push(val)
+  yzmValidator1(val: string){
+     return val == this.showRandom;
+  }
+
+  generateRandomStr() {
+    const num_arr = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    const res_arr: string[] = [];
+    while (res_arr.length < 4) {
+      const t = Math.floor(Math.random() * (num_arr.length - 1));
+      const val = num_arr[t];
+      if (!res_arr.includes(val)) res_arr.push(val);
     }
-    return res_arr.join("")
+    return res_arr.join("");
   }
 
-  renewRandom(){
-    this.showRandom = this.generateRandomStr()
+  renewRandom() {
+    this.showRandom = this.generateRandomStr();
   }
 
   toReset() {
     this.status = "reset";
   }
 
-  doRegister(){
-    register(this.form).then(data=>{
-      if(data && data.data && data.data.access_token){
-        const access_token = data.data.access_token
+  doRegister() {
+    register(this.form).then((data) => {
+      if (data && data.data && data.data.access_token) {
+        const access_token = data.data.access_token;
         Toast.success({
-          message:"恭喜您注册成功",
-          onClose(){
-             setToken(access_token)
-              const origin = location.origin
-              window.location.replace(origin)
-          }
-        })
+          message: "恭喜您注册成功",
+          onClose() {
+            setToken(access_token);
+            const origin = location.origin;
+            window.location.replace(origin);
+          },
+        });
       }
-    })
+    });
+  }
+
+  // 获取验证码
+  getVerifyCode() {
+    if (this.sendStatus == 1) return;
+    if (!this.form.phone) {
+      Toast("请填写手机号");
+    } else if (!phone_rule.test(this.form.phone)) {
+      Toast("请填写正确的手机号码");
+    } else {
+      sendMessage(this.form.phone).then((data) => {
+        if (data && data.origin_data.code == 1001) {
+          this.sendStatus = 1;
+          let count = 60;
+          const timer = setInterval(() => {
+            this.send_msg = `还有${--count}秒`;
+            if (count == 0) {
+              clearInterval(timer);
+              this.send_msg = "获取验证码";
+              this.sendStatus = 0;
+            }
+          }, 1000);
+        }
+      });
+    }
   }
 
   // 提交的行为
   onSubmit() {
-    console.log("进入到正常节奏")
-    this.doRegister()
+    console.log("进入到正常节奏");
+    this.doRegister();
   }
 }
 </script>
@@ -225,7 +277,7 @@ export default class Forget extends Vue<IProps> {
     padding: 20px 0px;
     margin: 0 auto;
 
-    .forget-content_item{
+    .forget-content_item {
       width: 340px;
       height: auto;
       margin: 0 auto;
@@ -311,16 +363,25 @@ export default class Forget extends Vue<IProps> {
     }
   }
 
-  .forget-verify_code{
+  .forget-verify_code {
     width: 260px;
   }
-  .forget-verify_content{
+  .forget-verify_content {
     flex: 1;
     @include setHeight(30px);
     letter-spacing: 4px;
     text-align: center;
-    color:cornflowerblue;
+    color: cornflowerblue;
     border: 2px solid #999;
+  }
+
+  .forget-verify_content_1 {
+    flex: 1;
+    @include setHeight(30px);
+    text-align: center;
+    font-size: 10px;
+    background: cornflowerblue;
+    color: #fff;
   }
 }
 </style>
