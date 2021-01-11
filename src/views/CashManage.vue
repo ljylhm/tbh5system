@@ -209,7 +209,7 @@ export default class Home extends Vue {
       value: "14",
     },
     {
-      label: "其他银行",
+      label: "邮政银行",
       value: "15",
     },
   ];

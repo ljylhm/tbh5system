@@ -15,6 +15,7 @@
             当前状态: {{ userData.status == 0 ? "待审核" : "审核通过" }}
           </div>
           <div>支付宝: {{ userData.nick || "--" }}</div>
+          <div>邀请码: <span>{{ userData.secret || "--" }}</span></div>
         </div>
       </div>
 

@@ -103,6 +103,15 @@
           />
         </div>
 
+        <div class="forget-content_item">
+          <van-field
+            v-model="form.secret"
+            name="请输入邀请码"
+            label="邀请码"
+            placeholder="请输入邀请码"
+          />
+        </div>
+
         <div style="margin: 16px">
           <van-button round block type="info" native-type="submit">
             注册
