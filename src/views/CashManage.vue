@@ -116,7 +116,7 @@
     </div>
 
     <div class="cash-record-item">
-      <span>卖家提现记录</span>
+      <span>买家提现记录</span>
       <span class="cash-record-right" @click="toCashOut">查看全部</span>
     </div>
 
@@ -211,7 +211,19 @@ export default class Home extends Vue {
     {
       label: "邮政银行",
       value: "15",
-    },
+    },{
+      label: "深圳发展银行",
+      value: "16",
+    },{
+      label: "恒丰银行",
+      value: "17",
+    },{
+      label:"浙商银行",
+      value: "18",
+    },{
+      label:"渤海银行",
+      value: "19",
+    }
   ];
 
   bankInfo: any = {};

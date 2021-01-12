@@ -7,9 +7,39 @@
       <div class="user-ordre-next_btn" @click="toNext">返回</div>
     </div>
 
+    <van-popup
+      v-model="showPicker"
+      position="bottom "
+      :style="{ height: '50%' }"
+    >
+      <van-picker
+        title="标题"
+        show-toolbar
+        :columns="areaList"
+        @confirm="confirm"
+        @cancel="cancel"
+      />
+    </van-popup>
+
     <div class="apply-pay-content">
-      <div>存款余额：{{ userData.amount || "0.00" }}元</div>
+      <div>存款余额：{{ calcMoney() }}元</div>
+      <div>
+        邀请奖励余额：{{ userData.invited_amount || "0.00" }}元
+        <span class="zy-font">(30天内仅能提现一次)</span>
+      </div>
       <div>提现方式：银行卡</div>
+      <div class="flex-s">
+        提现类型：<van-field
+          readonly
+          clickable
+          name="picker"
+          :value="advanceForm.type == 0 ? '账户余额' : '邀请余额'"
+          right-icon="arrow"
+          label=""
+          placeholder="点击选择类型"
+          @click="showPicker = true"
+        />
+      </div>
       <div>提款金额：</div>
       <div class="apply-pay-input">
         <input
@@ -41,20 +71,32 @@
             <td class="apply-pay-list-3">提现状态</td>
           </thead>
           <tbody>
-            <tr v-for="(item,key) in list" :key="key">
-              <td class="apply-pay-list-1 zy-font">
-                {{item.amount}}元
+            <tr v-for="(item, key) in list" :key="key">
+              <td class="apply-pay-list-1 zy-font">{{ item.amount }}元</td>
+              <td class="apply-pay-list-2">{{ item.created_at }}</td>
+              <td class="apply-pay-list-3">
+                {{
+                  item.status == "0"
+                    ? "待审核"
+                    : item.status == "1"
+                    ? "已到账"
+                    : "提现失败"
+                }}
               </td>
-              <td class="apply-pay-list-2">{{item.created_at}}</td>
-              <td class="apply-pay-list-3">{{
-                item.status == "0" ? "待审核" : item.status == "1" ? "已到账" : "提现失败"
-              }}</td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <div v-else style="text-align:center;color:#ddd;font-size:14px;padding:15px 0px">
+      <div
+        v-else
+        style="
+          text-align: center;
+          color: #ddd;
+          font-size: 14px;
+          padding: 15px 0px;
+        "
+      >
         暂无提现记录
       </div>
     </div>
@@ -92,7 +134,9 @@ import { Toast } from "vant";
 export default class Home extends Vue {
   isLoading: boolean = true; // 正在加载中
   finished: boolean = false; // 是否完成
+  showPicker: boolean = false; // 展示弹框
 
+  areaList = ["账户余额", "邀请余额"];
   userData: any = {};
 
   list: any[] = [];
@@ -103,7 +147,29 @@ export default class Home extends Vue {
         this.userData = data.data;
       }
     });
-    this.getAdvanceList()
+    this.getAdvanceList();
+  }
+
+  calcMoney() {
+    if (this.userData.amount && this.userData.invited_amount) {
+      return (
+        Number(this.userData.amount) - Number(this.userData.invited_amount)
+      );
+    }
+    return this.userData.amount || "0.00";
+  }
+
+  confirm(value: any) {
+    if (value == "账户余额") {
+      this.advanceForm.type = 0;
+    } else {
+      this.advanceForm.type = 1;
+    }
+    this.showPicker = false;
+  }
+
+  cancel() {
+    this.showPicker = false;
   }
 
   advanceAction() {
@@ -120,7 +186,17 @@ export default class Home extends Vue {
     advanceAction(this.advanceForm).then((data) => {
       if (data && data.origin_data) {
         if (data.origin_data.code == 1001) {
-          Toast.success("提现成功");
+          const that = this;
+          Toast.success({
+            message: "提现成功",
+            onClose() {
+              that.getAdvanceList();
+              that.advanceForm.amount = "";
+              that.advanceForm.pay_password = "";
+              // const origin = location.origin;
+              // window.location.replace(origin);
+            },
+          });
         } else {
           Toast(data.origin_data.msg || "提现失败");
         }
@@ -141,6 +217,7 @@ export default class Home extends Vue {
   advanceForm = {
     pay_password: "",
     amount: "",
+    type: 0,
   };
 
   toNext() {
@@ -160,6 +237,11 @@ export default class Home extends Vue {
 @mixin setHeight($height) {
   height: $height;
   line-height: $height;
+}
+
+.flex-s {
+  @include flex(flex-start);
+  align-items: center;
 }
 
 .zy-font {
@@ -252,6 +334,10 @@ export default class Home extends Vue {
     background: #fff;
     box-sizing: border-box;
     padding: 10px;
+    .van-cell {
+      width: 150px;
+      padding: 0px;
+    }
     .apply-pay-input {
       border: 1px solid #ddd;
       font-size: 14px;

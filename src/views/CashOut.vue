@@ -1,6 +1,6 @@
 <template>
   <div class="user-order-container">
-    <VHeader :msg="'卖家提现记录'" :showExitBtn="true"></VHeader>
+    <VHeader :msg="'买家提现记录'" :showExitBtn="true"></VHeader>
     <VFooter :msg="'资金管理'"></VFooter>
 
     <div class="user-order-header-1">
