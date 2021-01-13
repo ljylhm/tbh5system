@@ -408,7 +408,7 @@ export default class Home extends Vue {
       font-size: 14px;
     }
 
-    .create-account_btn_1 {
+    .create-bank_btn_1 {
       background: #ff9900;
     }
 

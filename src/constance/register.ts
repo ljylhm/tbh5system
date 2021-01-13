@@ -1,0 +1,1 @@
+export const CACHE_NAME = "register_cache"
