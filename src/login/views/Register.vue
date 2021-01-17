@@ -115,7 +115,7 @@
 
           <div class="forget-content_item">
             <van-field
-              v-model="form.secret"
+              v-model="form.card"
               name="请输入身份证号码"
               label="身份证号"
               placeholder="请输入身份证号码"
@@ -125,14 +125,24 @@
             />
           </div>
 
+          <div class="forget-content_item">
+            <van-field
+              v-model="form.full_name"
+              name="请输入真实姓名"
+              label="真实姓名"
+              placeholder="请输入真实姓名"
+              :rules="[{ required: true, message: '请填写真实姓名' }]"
+            />
+          </div>
+          
           <div class="forget-content_item forget-content_item_1">
             <div class="create-account-image" style="color:#696566">
               <p>上传身份证截图：</p>
               <div class="create-account-image_content">
                 <van-uploader
-                  v-model="fileList1"
+                  v-model="fileList4"
                   :deletable="false"
-                  :after-read="uploadJd"
+                  :after-read="uploadCardPic"
                   :max-count="1"
                 />
                 <div
@@ -143,6 +153,28 @@
               </div>
             </div>
           </div>
+
+          <div class="forget-content_item forget-content_item_1">
+            <div class="create-account-image" style="color:#696566">
+              <p>上传支付宝截图：</p>
+              <div class="create-account-image_content">
+                <van-uploader
+                  v-model="fileList5"
+                  :deletable="false"
+                  :after-read="uploadAliPayPic"
+                  :max-count="1"
+                />
+                <div
+                  class="create-account-image_pic"
+                  @click="previewImage(preview_four)"
+                >
+                   <img :src="preview_four" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+
           <div style="margin: 16px">
             <van-button round block type="info" native-type="submit">
               下一步
@@ -157,7 +189,7 @@
         <div class="create-account-item">
           <div class="create-account-item_label">会员名：</div>
           <div class="create-account-item_input">
-            <input :placeholder="`请输入淘宝会员名`" v-model="buyerform.name" />
+            <input :placeholder="`请输入淘宝会员名`" v-model="buyerform.buyer_name" />
           </div>
         </div>
 
@@ -300,7 +332,7 @@
             />
 
             <van-field
-              v-model="bindForm.name"
+              v-model="bindForm.bank_name"
               label="开户人"
               placeholder="请输入开户人"
             />
@@ -328,12 +360,12 @@
               placeholder="开户行"
             />
 
-            <van-field
+            <!-- <van-field
               v-model="bindForm.pay_password"
               label="支付密码"
               type="password"
               placeholder="请输入支付密码"
-            />
+            /> -->
           </van-form>
 
           <div class="create-bank-operation">
@@ -342,7 +374,7 @@
             </div>
             <div
               class="create-bank_btn create-bank_btn_2"
-              @click="toStepThree()"
+              @click="toStepTwo()"
             >
               上一步
             </div>
@@ -370,7 +402,7 @@ import { upLoadImage } from "@/lib/uploadImage";
 import { completeImgUrl } from "@/lib/helper";
 import { routerHelper } from "@/router";
 import areaList from "@/lib/area";
-import { setCache, getCache } from "@/lib/cache";
+import { setCache, getCache, clearCache } from "@/lib/cache";
 import { ImagePreview, Toast } from "vant";
 import { CACHE_NAME } from "@/constance/register";
 
@@ -408,16 +440,20 @@ export default class Forget extends Vue<IProps> {
     type: 0,
     nick: "",
     secret: "",
+    full_name:"",                             // 身份证全名
+    card:"",                                  // 身份证号码
+    card_pic:"",                              // 身份证图片
+    alipay_pic:""                             // 支付宝截图
   };
 
   buyerform: {
-    name: string;
-    type: number;
+    buyer_name: string;
+    buyer_type: number;
     sex: string;
     img_url: string[];
   } = {
-    name: "",
-    type: 1,
+    buyer_name: "",
+    buyer_type: 1,
     sex: "0",
     img_url: [],
   };
@@ -425,9 +461,8 @@ export default class Forget extends Vue<IProps> {
   bindForm: any = {
     bank: "",
     card_no: "",
-    name: "",
+    bank_name: "",
     address: "",
-    pay_password: "",
     bank_address: "",
   };
 
@@ -437,10 +472,15 @@ export default class Forget extends Vue<IProps> {
     "http://img.baishou123.cn/public/home/images/pddmaihao2.png";
   preview_three: string =
     "http://img.baishou123.cn/public/home/images/pddmaihao3.png";
+  preview_four: string =
+    "https://imgqn.smm.cn/production/b/image/JxHsO20210117153926.jpeg";
 
   fileList = [];
   fileList1 = [];
   fileList2 = [];
+
+  fileList4 = []
+  fileList5 = []
 
   img_one = "";
   img_two = "";
@@ -549,18 +589,18 @@ export default class Forget extends Vue<IProps> {
     var verifyCode = new GVerify("forget-verify");
     this.renewRandom();
     this.bindBankData = this.bankData.map((item: any) => item.label);
-    let cache_info: any = getCache(CACHE_NAME);
-    if (cache_info) {
-      cache_info = JSON.parse(cache_info);
-    } else {
-      cache_info = {};
-    }
+    // let cache_info: any = getCache(CACHE_NAME);
+    // if (cache_info) {
+    //   cache_info = JSON.parse(cache_info);
+    // } else {
+    //   cache_info = {};
+    // }
 
-    if (cache_info.step) {
-      this.form = cache_info.form;
-      this.buyerform = cache_info.buyerform;
-      this.bindForm = cache_info.bindForm;
-    }
+    // if (cache_info.step) {
+    //   this.form = cache_info.form;
+    //   this.buyerform = cache_info.buyerform;
+    //   this.bindForm = cache_info.bindForm;
+    // }
   }
 
   changeStep(step: number) {
@@ -591,6 +631,23 @@ export default class Forget extends Vue<IProps> {
   uploadPdd(file: any) {
     this.upLoadImageAction(file.file, 2);
   }
+
+  uploadCardPic(file:any){
+    upLoadImage(file.file).then((res) => {
+      if (res && res.data) {
+        this.form.card_pic = completeImgUrl(res.data.src);
+      }
+    });
+  }
+
+  uploadAliPayPic(file:any){
+    upLoadImage(file.file).then((res) => {
+      if (res && res.data) {
+        this.form.alipay_pic = completeImgUrl(res.data.src);
+      }
+    });
+  }
+  
 
   previewImage(pic_url: string) {
     ImagePreview([pic_url]);
@@ -650,9 +707,12 @@ export default class Forget extends Vue<IProps> {
   }
 
   doRegister() {
-    register(this.form).then((data) => {
+    const form = Object.assign({},this.form,this.buyerform,this.bindForm)
+    console.log("当前的表单",form)
+    register(form).then((data) => {
       if (data && data.data && data.data.access_token) {
         const access_token = data.data.access_token;
+        // clearCache(CACHE_NAME)
         Toast.success({
           message: "恭喜您注册成功",
           onClose() {
@@ -663,6 +723,7 @@ export default class Forget extends Vue<IProps> {
         });
       }
     });
+  
   }
 
   // 获取验证码
@@ -710,18 +771,27 @@ export default class Forget extends Vue<IProps> {
         ...that.bindForm,
       },
     };
-    setCache(CACHE_NAME, JSON.stringify(cache_form));
+    // setCache(CACHE_NAME, JSON.stringify(cache_form));
   }
 
   // 提交的行为
   onSubmit() {
+    console.log("表单 表单",this.form)
+    if(!this.form.card_pic){
+      Toast("请上传身份证截图~")
+      return
+    }
+
+    if(!this.form.alipay_pic){
+      Toast("请上传支付宝截图~")
+      return
+    }
     this.toStepTwo();
     this.setCache(2);
-    // this.doRegister();
   }
 
   onSubmit2() {
-    if (!this.buyerform.name) {
+    if (!this.buyerform.buyer_name) {
       Toast("请输入用户名~");
     } else if (this.buyerform.img_url.length <= 0) {
       Toast("请上传截图");
@@ -764,12 +834,16 @@ export default class Forget extends Vue<IProps> {
   }
 
   onSubmit3() {
+
+    console.log("第一步表单",this.form)
+    console.log("第二步表单",this.buyerform)
+    console.log("第三步表单",this.bindForm)
     if (!this.bindForm.bank) {
       Toast("请选择银行");
       return;
     }
 
-    if (!this.bindForm.name) {
+    if (!this.bindForm.bank_name) {
       Toast("请输入开户人");
       return;
     }
@@ -784,10 +858,13 @@ export default class Forget extends Vue<IProps> {
       return;
     }
 
-    if (!this.bindForm.pay_password) {
-      Toast("请输入支付密码");
+    if (!this.bindForm.bank_address) {
+      Toast("请输入开户行");
       return;
     }
+
+    this.doRegister();
+
   }
 }
 </script>

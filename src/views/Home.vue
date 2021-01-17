@@ -12,7 +12,7 @@
         <div class="person-container_info">
           <div>会员账号: {{ userData.name }}</div>
           <div>
-            当前状态: {{ userData.status == 0 ? "待审核" : "审核通过" }}
+            当前状态: {{ userData.status == 0 ? "待审核" : status == 2 ? "审核不通过" : "审核通过" }}
           </div>
           <div>支付宝: {{ userData.nick || "--" }}</div>
           <div>邀请码: <span>{{ userData.secret || "--" }}</span></div>

@@ -73,12 +73,13 @@
 
           <van-field v-model="bindForm.bank_address" label="开户行" placeholder="开户行" />
 
-          <van-field
+          <!-- <van-field
             v-model="bindForm.pay_password"
             label="支付密码"
             type="password"
             placeholder="请输入支付密码"
-          />
+          /> -->
+
         </van-form>
 
         <div class="create-account-operation">
@@ -118,7 +119,7 @@ import { openAlertError } from "@/lib/notice";
 import areaList from "@/lib/area";
 import RouterHelper from "@/lib/router";
 import { getUserInfo } from "@/service/login";
-import { addBank } from "@/service/bank";
+import { addBank, editBank, getBank } from "@/service/bank";
 
 @Component({
   components: {
@@ -229,12 +230,19 @@ export default class Home extends Vue {
   ];
 
   bindBankData: string[] = [];
+  bankInfo:any = {}
 
   mounted() {
     getUserInfo().then((data) => {
       if (data && data.origin_data) {
         console.log("接收到的数据", data);
         this.userInfo = data.origin_data.data;
+      }
+    });
+
+     getBank().then((data: any) => {
+      if (data && data.data && data.data.bank) {
+        this.bindForm = data.data.bank;
       }
     });
 
@@ -298,11 +306,11 @@ export default class Home extends Vue {
       return;
     }
 
-    if (!this.bindForm.pay_password) {
-      Toast("请输入支付密码");
-      return;
-    }
-    addBank(this.bindForm).then((data) => {
+    // if (!this.bindForm.pay_password) {
+    //   Toast("请输入支付密码");
+    //   return;
+    // }
+    editBank(this.bindForm).then((data) => {
       if (data && data.origin_data && data.origin_data.code == 1001) {
         Toast("修改成功");
         routerHelper.to("/cashManage");

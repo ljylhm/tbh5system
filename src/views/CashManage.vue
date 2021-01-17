@@ -95,6 +95,9 @@
     <div class="cash-bank">
       <div class="bank-card_icon"></div>
       <div class="bank-card_content">
+        <p v-if="bankInfo && bankInfo.id && bankInfo.status == 0">状态：审核中</p>
+        <p v-if="bankInfo && bankInfo.id && bankInfo.status == 1">状态：审核通过</p>
+        <p v-if="bankInfo && bankInfo.id && bankInfo.status == 2">状态：审核不通过</p>
         <p>默认提现银行卡：{{ bankInfo.bank ? bankInfo.bank : "" }}</p>
         <p>
           尾号
@@ -104,9 +107,9 @@
         </p>
       </div>
       <div class="bank-card_btn">
-        <div @click="deleteBank" v-if="bankInfo && bankInfo.id && bankInfo.status == 1">删除</div>
-        <div v-else-if="bankInfo && bankInfo.id && bankInfo.status == 0">审核中</div>
-        <div @click="openEditBankCardModal" v-else>创建</div>
+        <!-- <div @click="deleteBank" v-if="bankInfo && bankInfo.id && bankInfo.status == 1">删除</div> -->
+        <!-- <div v-if="bankInfo && bankInfo.id && bankInfo.status == 0">审核中</div> -->
+        <div v-if="bankInfo && bankInfo.id && (bankInfo.status == 1 || bankInfo.status == 2)" @click="openEditBankCardModal">修改</div>
       </div>
     </div>
 

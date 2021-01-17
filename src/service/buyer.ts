@@ -17,5 +17,10 @@ export const addBuyer = (form:{
     return httpPost("/api/buyer/add",form)
 }
 
+// 修改买手信息
+export const editBuyer = (form:any) => {
+    return httpPost("/api/buyer/update",form)
+}
+
 // 修改用户信息的一些接口
 export const editUserInfo = (editInfo:any) => httpPost("/api/update",editInfo)

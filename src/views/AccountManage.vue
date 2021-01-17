@@ -36,7 +36,7 @@
       <div class="buyer-item_middle">
         <div>
           淘宝：<span class="zy-font">{{
-            tbBuyerInfo && tbBuyerInfo.status == 0 ? "待审核" : tbBuyerInfo.status == 1 ? "审核通过" : "未添加"
+            tbBuyerInfo && tbBuyerInfo.status == 0 ? "待审核" : tbBuyerInfo.status == 1 ? "审核通过" : "审核不通过"
           }}</span>
         </div>
         <div>
@@ -47,9 +47,8 @@
         <div
           class="buyer-item_btn"
           @click="toCreateAccount(1)"
-          v-if="!tbBuyerInfo.id"
         >
-          添加
+          修改
         </div>
       </div>
     </div>
@@ -67,13 +66,13 @@
         </div>
       </div>
       <div class="buyer-item_right">
-        <div
+        <!-- <div
           class="buyer-item_btn"
           @click="toCreateAccount(2)"
           v-if="!jdBuyerInfo.id"
         >
           添加
-        </div>
+        </div> -->
       </div>
     </div>
 
@@ -90,13 +89,13 @@
         </div>
       </div>
       <div class="buyer-item_right">
-        <div
+        <!-- <div
           class="buyer-item_btn"
           @click="toCreateAccount(3)"
           v-if="!pddBuyerInfo.id"
         >
           添加
-        </div>
+        </div> -->
       </div>
     </div>
 

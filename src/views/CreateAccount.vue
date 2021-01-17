@@ -26,7 +26,7 @@
           <div class="create-account-image_content">
             <van-uploader
               v-model="fileList"
-              :deletable="false"
+              :deletable="true"
               :after-read="uploadTb"
               :max-count="1" 
             />
@@ -45,7 +45,7 @@
           <div class="create-account-image_content">
             <van-uploader
               v-model="fileList1"
-              :deletable="false"
+              :deletable="true"
               :after-read="uploadJd"
               :max-count="1" 
             />
@@ -64,7 +64,7 @@
           <div class="create-account-image_content">
             <van-uploader
               v-model="fileList2"
-              :deletable="false"
+              :deletable="true"
               :after-read="uploadPdd"
               :max-count="1"
             />
@@ -96,7 +96,7 @@ import { ImagePreview, Toast } from "vant";
 import { upLoadImage } from "@/lib/uploadImage";
 import { routerHelper } from "@/router";
 import { completeImgUrl } from '@/lib/helper';
-import { addBuyer } from '@/service/buyer';
+import { addBuyer, editBuyer, getBuyerList } from '@/service/buyer';
 import { openAlertError } from '@/lib/notice';
 import { getUserInfo } from '@/service/login';
 
@@ -124,9 +124,9 @@ export default class Home extends Vue {
   preview_three: string =
     "http://img.baishou123.cn/public/home/images/pddmaihao3.png";
 
-  fileList = [];
-  fileList1 = [];
-  fileList2 = [];
+  fileList:any = [];
+  fileList1:any = [];
+  fileList2:any = [];
 
   form:{
     name: string
@@ -150,6 +150,8 @@ export default class Home extends Vue {
     this.platType = type;
     (this.form as any).type = type;
 
+    this.getBuyerInfo()
+
     if(type == "2"){
       this.preview_one = "https://imgqn.smm.cn/production/b/image/NMzSJ20201124221026.png"
       this.preview_two = "https://imgqn.smm.cn/production/b/image/PCeVe20201124221225.png"
@@ -158,8 +160,42 @@ export default class Home extends Vue {
     console.log("获取的传过来的type", type);
   }
 
+  buyerInfo:any = {}
+  tbBuyerInfo:any = {}
+
+  // 获取买手信息
+  getBuyerInfo() {
+    getBuyerList().then((data) => {
+      if (data && data.data) {
+        this.buyerInfo = data.data;
+        this.buyerInfo.forEach((item: any) => {
+          if (item.type == "1") this.form = item
+        });
+        this.form.sex = this.form.sex.toString()
+        this.form.img_url = JSON.parse((this.form.img_url as any))
+        this.form.img_url.forEach((i:any,index)=>{
+            if(index == 0){
+              this.fileList = [{
+                url: i
+              }]
+            }
+            if(index == 1){
+              this.fileList1 = [{
+                url: i
+              }]
+            }
+            if(index == 2){
+              this.fileList2 = [{
+                url: i
+              }]
+            }
+        })
+        console.log("fileList fileList",this.form)
+      }
+    });
+  }
+
   uploadTb(file:any){
-    console.log("xxx",file.file)
     this.upLoadImageAction(file.file,0)
   }
 
@@ -224,7 +260,7 @@ export default class Home extends Vue {
     }else if(this.form.img_url.length <= 0){
       Toast("请上传截图")
     }else{
-      addBuyer(this.form).then(data => {
+      editBuyer(this.form).then(data => {
         if(data && data.origin_data && data.origin_data.code == 1001 ){
           Toast.success("保存成功")
           routerHelper.to("/AccountManage")
