@@ -117,12 +117,19 @@ export default class Home extends Vue {
     { name: "女", value: "1" },
   ];
 
+  // preview_one: string =
+  //   "http://img.baishou123.cn/public/home/images/pddmaihao1.png";
+  // preview_two: string =
+  //   "http://img.baishou123.cn/public/home/images/pddmaihao2.png";
+  // preview_three: string =
+  //   "http://img.baishou123.cn/public/home/images/pddmaihao3.png";
+
   preview_one: string =
-    "http://img.baishou123.cn/public/home/images/pddmaihao1.png";
+    "https://imgqn.smm.cn/production/b/image/NTCPH20210118211135.png";
   preview_two: string =
-    "http://img.baishou123.cn/public/home/images/pddmaihao2.png";
+    "https://imgqn.smm.cn/production/b/image/kKjcU20210118211135.jpeg";
   preview_three: string =
-    "http://img.baishou123.cn/public/home/images/pddmaihao3.png";
+    "https://imgqn.smm.cn/production/b/image/bCfEw20210118211136.png";
 
   fileList:any = [];
   fileList1:any = [];

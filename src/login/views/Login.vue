@@ -75,6 +75,7 @@ export default class Login extends Vue<IProps> {
     login(user, password).then((data) => {
       if (data && data.data && data.data.access_token) {
         const access_token = data.data.access_token;
+        localStorage.setItem("ISLOGIN","1")
         Toast.success({
           message: "登录成功",
           duration:500,

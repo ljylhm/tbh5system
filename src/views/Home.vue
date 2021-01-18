@@ -2,6 +2,12 @@
   <div class="home">
     <VHeader :msg="'首页'" :showExitBtn="true"></VHeader>
     <VFooter :msg="'首页'"></VFooter>
+
+    <van-dialog v-model="showNoticeModal" title="平台公告" show-cancel-button>
+     <div style="notice-container" v-html="noticeContent"></div>
+    </van-dialog>
+
+
     <div class="person-container">
       <div class="person-container_top">
         <div class="person-container_avatur">
@@ -12,7 +18,7 @@
         <div class="person-container_info">
           <div>会员账号: {{ userData.name }}</div>
           <div>
-            当前状态: {{ userData.status == 0 ? "待审核" : status == 2 ? "审核不通过" : "审核通过" }}
+            当前状态: {{ userData.status == 0 ? "待审核" : userData.status == 2 ? "审核不通过" : "审核通过" }}
           </div>
           <div>支付宝: {{ userData.nick || "--" }}</div>
           <div>邀请码: <span>{{ userData.secret || "--" }}</span></div>
@@ -137,6 +143,7 @@ import { getUserInfo } from "@/service/login";
 import { Dialog } from "vant";
 import { Toast } from "vant";
 import { routerHelper } from "@/router";
+import { getNewNotice } from "@/service/notice";
 
 @Component({
   components: {
@@ -161,6 +168,10 @@ export default class Home extends Vue {
   orderCount: any = 0;
   commentCount: any = 0;
 
+  noticeContent:any = ""
+
+  showNoticeModal:any = false
+
   created() {
     getCommentList({
       limit: 10,
@@ -172,6 +183,19 @@ export default class Home extends Vue {
         this.commentCount = data.data.total;
       }
     });
+
+    getNewNotice().then((data:any)=>{
+       if (data && data.origin_data && data.origin_data.code == 1001) {
+        const res = data.data;
+        this.noticeContent = res[0].content;
+        const IS_LOGIN = localStorage.getItem("ISLOGIN")
+        console.log("IS_LOGIN IS_LOGINv",IS_LOGIN,this.noticeContent)
+        if (IS_LOGIN === "1" && this.noticeContent) {
+          localStorage.setItem("ISLOGIN","0")
+          this.openNoticeModal()
+        }
+      }
+    })
 
     getUserInfo().then((data) => {
       if (data && data.origin_data && data.origin_data.code == 1001) {
@@ -196,6 +220,15 @@ export default class Home extends Vue {
       }
     });
   }
+
+   closeNoticeModal() {
+    this.showNoticeModal = false;
+  }
+
+  openNoticeModal() {
+    this.showNoticeModal = true;
+  }
+
 
   // 类型选择
   typeSelect(type: string) {
@@ -306,11 +339,21 @@ export default class Home extends Vue {
 .zy-font {
   color: red;
 }
+.notice-container{
+  width: 100%;
+  max-height: 400px;
+  overflow: auto;
+}
 
 .home {
   width: 100vw;
   height: 100vh;
   background: #f2f2f2;
+  .van-dialog__content{
+    max-height: 400px;
+    overflow: scroll;
+    text-align: left;
+  }
   .home-banner_container {
     width: 100%;
     height: 400px;

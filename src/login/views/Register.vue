@@ -30,6 +30,30 @@
           </div>
 
           <div class="forget-content_item">
+            <van-field
+              v-model="form.password"
+              type="password"
+              name="用户登录密码"
+              label="用户登录密码"
+              placeholder="用户登录密码"
+              :rules="[{ required: true, message: '请填写密码' }]"
+            />
+          </div>
+
+          <div class="forget-content_item">
+            <van-field
+              v-model="form.passwordAgain"
+              type="password"
+              name="再次输入密码"
+              label="再次输入密码"
+              placeholder="再次输入密码"
+              :rules="[
+                { validator: pasAgainValidator, message: '两次密码不一致' },
+              ]"
+            />
+          </div>
+
+          <div class="forget-content_item">
             <div class="forget-verify_code">
               <van-field
                 v-model="form.verifyCode"
@@ -60,7 +84,7 @@
             </div>
           </div>
 
-          <div class="forget-content_item">
+          <!-- <div class="forget-content_item">
             <van-field
               v-model="form.qq"
               name="qq"
@@ -68,7 +92,7 @@
               placeholder="qq"
               :rules="[{ required: false, message: '请填写qq' }]"
             />
-          </div>
+          </div> -->
 
           <div class="forget-content_item">
             <van-field
@@ -82,38 +106,15 @@
 
           <div class="forget-content_item">
             <van-field
-              v-model="form.password"
-              type="password"
-              name="密码"
-              label="密码"
-              placeholder="密码"
-              :rules="[{ required: true, message: '请填写密码' }]"
+              v-model="form.full_name"
+              name="请输入真实姓名"
+              label="真实姓名"
+              placeholder="请输入真实姓名"
+              :rules="[{ required: true, message: '请填写真实姓名' }]"
             />
           </div>
 
-          <div class="forget-content_item">
-            <van-field
-              v-model="form.passwordAgain"
-              type="password"
-              name="再次输入密码"
-              label="再次输入密码"
-              placeholder="再次输入密码"
-              :rules="[
-                { validator: pasAgainValidator, message: '两次密码不一致' },
-              ]"
-            />
-          </div>
-
-          <div class="forget-content_item">
-            <van-field
-              v-model="form.secret"
-              name="请输入邀请码"
-              label="邀请码"
-              placeholder="请输入邀请码"
-            />
-          </div>
-
-          <div class="forget-content_item">
+           <div class="forget-content_item">
             <van-field
               v-model="form.card"
               name="请输入身份证号码"
@@ -123,35 +124,6 @@
                 { validator: idCardValidator, message: '请输入正确的身份证号码' },
               ]"
             />
-          </div>
-
-          <div class="forget-content_item">
-            <van-field
-              v-model="form.full_name"
-              name="请输入真实姓名"
-              label="真实姓名"
-              placeholder="请输入真实姓名"
-              :rules="[{ required: true, message: '请填写真实姓名' }]"
-            />
-          </div>
-          
-          <div class="forget-content_item forget-content_item_1">
-            <div class="create-account-image" style="color:#696566">
-              <p>上传身份证截图：</p>
-              <div class="create-account-image_content">
-                <van-uploader
-                  v-model="fileList4"
-                  :deletable="false"
-                  :after-read="uploadCardPic"
-                  :max-count="1"
-                />
-                <div
-                  class="create-account-image_pic"
-                  @click="previewImage(preview_two)"
-                >
-                </div>
-              </div>
-            </div>
           </div>
 
           <div class="forget-content_item forget-content_item_1">
@@ -174,6 +146,35 @@
             </div>
           </div>
 
+          <div class="forget-content_item forget-content_item_1">
+            <div class="create-account-image" style="color:#696566">
+              <p>上传身份证截图：</p>
+              <div class="create-account-image_content">
+                <van-uploader
+                  v-model="fileList4"
+                  :deletable="false"
+                  :after-read="uploadCardPic"
+                  :max-count="1"
+                />
+                <div
+                  class="create-account-image_pic"
+                  @click="previewImage(preview_two)"
+                >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="forget-content_item">
+            <van-field
+              v-model="form.secret"
+              name="请输入邀请码"
+              label="邀请码"
+              placeholder="请输入邀请码"
+            />
+          </div>
+
+          
 
           <div style="margin: 16px">
             <van-button round block type="info" native-type="submit">
@@ -467,13 +468,16 @@ export default class Forget extends Vue<IProps> {
   };
 
   preview_one: string =
-    "http://img.baishou123.cn/public/home/images/pddmaihao1.png";
+    "https://imgqn.smm.cn/production/b/image/NTCPH20210118211135.png";
   preview_two: string =
-    "http://img.baishou123.cn/public/home/images/pddmaihao2.png";
+    "https://imgqn.smm.cn/production/b/image/kKjcU20210118211135.jpeg";
   preview_three: string =
-    "http://img.baishou123.cn/public/home/images/pddmaihao3.png";
+    "https://imgqn.smm.cn/production/b/image/bCfEw20210118211136.png";
   preview_four: string =
     "https://imgqn.smm.cn/production/b/image/JxHsO20210117153926.jpeg";
+
+
+  
 
   fileList = [];
   fileList1 = [];
@@ -577,12 +581,7 @@ export default class Forget extends Vue<IProps> {
   bindBankData: string[] = [];
 
   created() {
-    this.preview_one =
-      "https://imgqn.smm.cn/production/b/image/NMzSJ20201124221026.png";
-    this.preview_two =
-      "https://imgqn.smm.cn/production/b/image/PCeVe20201124221225.png";
-    this.preview_one =
-      "https://imgqn.smm.cn/production/b/image/wbcLS20201124221246.png";
+   
   }
 
   mounted() {
@@ -712,6 +711,7 @@ export default class Forget extends Vue<IProps> {
     register(form).then((data) => {
       if (data && data.data && data.data.access_token) {
         const access_token = data.data.access_token;
+        localStorage.setItem("ISLOGIN","1")
         // clearCache(CACHE_NAME)
         Toast.success({
           message: "恭喜您注册成功",
