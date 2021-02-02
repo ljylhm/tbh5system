@@ -3,10 +3,20 @@
     <VHeader :msg="'首页'" :showExitBtn="true"></VHeader>
     <VFooter :msg="'首页'"></VFooter>
 
-    <van-dialog v-model="showNoticeModal" title="平台公告" show-cancel-button>
-     <div style="notice-container" v-html="noticeContent"></div>
+    <van-dialog v-model="showNoticeModal" title="平台公告" show-cancel-button :beforeClose="afterClose">
+      <div class="notice-container" v-html="noticeContent"></div>
     </van-dialog>
 
+    <van-dialog v-model="showRulesModal" title="积分规则" show-cancel-button>
+      <div class="rules-container">
+        <p>1. 注册初始积分200分每天可接单2单接单任务金额不大于200元</p>
+        <p>2. 每做一单积分10分</p>
+        <p>3. 累计20单 可每天接单3单</p>
+        <p>4. 累计40单 每天可接单4单 也是最高每天的接单数量</p>
+        <p>5. 接单金额大小由积分决定</p>
+        <p>6. 200积分接单小于200元 300积分接单金额小于300元 以此类推</p>
+      </div>
+    </van-dialog>
 
     <div class="person-container">
       <div class="person-container_top">
@@ -18,10 +28,30 @@
         <div class="person-container_info">
           <div>会员账号: {{ userData.name }}</div>
           <div>
-            当前状态: {{ userData.status == 0 ? "待审核" : userData.status == 2 ? "审核不通过" : "审核通过" }}
+            当前状态:
+            {{
+              userData.status == 0
+                ? "待审核"
+                : userData.status == 2
+                ? "审核不通过"
+                : "审核通过"
+            }}
           </div>
           <div>支付宝: {{ userData.nick || "--" }}</div>
-          <div>邀请码: <span>{{ userData.secret || "--" }}</span></div>
+          <div>
+            邀请码: <span>{{ userData.secret || "--" }}</span>
+          </div>
+          <div>
+            我的积分: <span>{{ userData.score || "0" }}</span>
+             <van-button
+              type="primary"
+              color="#F90"
+              size="mini"
+              style="margin-left:10px"
+              @click="openRulesModal"
+              >积分规则</van-button
+            >
+          </div>
         </div>
       </div>
 
@@ -38,6 +68,33 @@
               color="#F90"
               size="mini"
               @click="toWorkOrderList"
+              >查看详情</van-button
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="person-container_bottom">
+        <div class="person-container_bottom_left">
+          <div>邀请人记录</div>
+          <div>
+            <van-button
+              type="primary"
+              color="#F90"
+              size="mini"
+              @click="toInviteDetail"
+              >查看详情</van-button
+            >
+          </div>
+        </div>
+        <div class="person-container_bottom_right">
+          <div>邀请奖励明细</div>
+          <div>
+            <van-button
+              type="primary"
+              color="#F90"
+              size="mini"
+              @click="toInviteCharge"
               >查看详情</van-button
             >
           </div>
@@ -144,6 +201,7 @@ import { Dialog } from "vant";
 import { Toast } from "vant";
 import { routerHelper } from "@/router";
 import { getNewNotice } from "@/service/notice";
+import { dateFormate } from "@/lib/time";
 
 @Component({
   components: {
@@ -168,9 +226,10 @@ export default class Home extends Vue {
   orderCount: any = 0;
   commentCount: any = 0;
 
-  noticeContent:any = ""
+  noticeContent: any = "";
 
-  showNoticeModal:any = false
+  showNoticeModal: any = false;
+  showRulesModal: any = false;
 
   created() {
     getCommentList({
@@ -184,18 +243,23 @@ export default class Home extends Vue {
       }
     });
 
-    getNewNotice().then((data:any)=>{
-       if (data && data.origin_data && data.origin_data.code == 1001) {
+    getNewNotice().then((data: any) => {
+      if (data && data.origin_data && data.origin_data.code == 1001) {
         const res = data.data;
-        this.noticeContent = res[0].content;
-        const IS_LOGIN = localStorage.getItem("ISLOGIN")
-        console.log("IS_LOGIN IS_LOGINv",IS_LOGIN,this.noticeContent)
-        if (IS_LOGIN === "1" && this.noticeContent) {
-          localStorage.setItem("ISLOGIN","0")
-          this.openNoticeModal()
+        if (res.length > 0) {
+          this.noticeContent = res[0].content;
+
+          const IS_LOGIN = localStorage.getItem("LOGINDATE");
+          // 获取今天的日期
+          const TODAY_DATE = this.getTodayDate();
+          if (IS_LOGIN && IS_LOGIN == TODAY_DATE) {
+            // donothing
+          } else {
+            this.openNoticeModal();
+          }
         }
       }
-    })
+    });
 
     getUserInfo().then((data) => {
       if (data && data.origin_data && data.origin_data.code == 1001) {
@@ -221,7 +285,13 @@ export default class Home extends Vue {
     });
   }
 
-   closeNoticeModal() {
+  afterClose(action:any, done:any){
+    this.cacheTodayDate();
+    done()
+  }
+
+  closeNoticeModal() {
+    this.cacheTodayDate();
     this.showNoticeModal = false;
   }
 
@@ -229,6 +299,27 @@ export default class Home extends Vue {
     this.showNoticeModal = true;
   }
 
+  closeRulesModal(){
+    this.showRulesModal = false
+  }
+
+  openRulesModal(){
+    this.showRulesModal = true
+  }
+
+  dateFormateAction(date: string | number, fmt: string) {
+    return dateFormate(date, fmt);
+  }
+
+  getTodayDate() {
+    const date = this.dateFormateAction(Date.now(), "yyyy-MM-dd");
+    return date;
+  }
+
+  cacheTodayDate() {
+    const date = this.dateFormateAction(Date.now(), "yyyy-MM-dd");
+    localStorage.setItem("LOGINDATE", date.toString());
+  }
 
   // 类型选择
   typeSelect(type: string) {
@@ -317,9 +408,18 @@ export default class Home extends Vue {
     routerHelper.to("/commentList");
   }
 
-  toWorkOrderList(){
+  toWorkOrderList() {
     routerHelper.to("/workOrderList");
   }
+
+  toInviteDetail(){
+     routerHelper.to("/inviteDetail");
+  }
+
+  toInviteCharge(){
+     routerHelper.to("/inviteCharge");
+  }
+
 }
 </script>
 
@@ -339,17 +439,27 @@ export default class Home extends Vue {
 .zy-font {
   color: red;
 }
-.notice-container{
+.notice-container {
   width: 100%;
   max-height: 400px;
-  overflow: auto;
+  overflow: auto
+}
+
+.rules-container{
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  font-size: 14px;
+  p{
+    margin: 5px 0px;
+  }
 }
 
 .home {
   width: 100vw;
   height: 100vh;
   background: #f2f2f2;
-  .van-dialog__content{
+  .van-dialog__content {
     max-height: 400px;
     overflow: scroll;
     text-align: left;

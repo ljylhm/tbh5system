@@ -18,6 +18,8 @@ import CashPic from '@/views/CashPic.vue'
 import WorkOrderDetail from '@/views/WorkOrderDetail.vue'
 import WorkOrderList from '@/views/WorkOrderList.vue'
 import WorkOrderDetailTwo from '@/views/WorkOrderDetailTwo.vue'
+import InviteDetail from '@/views/InviteDetail.vue'
+import InviteCharge from '@/views/InviteCharge.vue'
 import RouterHelper from '@/lib/router'
 
 Vue.use(VueRouter)
@@ -165,6 +167,22 @@ const routes: Array<RouteConfig> = [
     component: WorkOrderDetailTwo,
     meta:{
       title: "工单详情"
+    }
+  },
+  {
+    path: '/inviteDetail',
+    name: 'InviteDetail',
+    component: InviteDetail,
+    meta:{
+      title: "邀请明细"
+    }
+  },
+  {
+    path: '/inviteCharge',
+    name: 'InviteCharge',
+    component: InviteCharge,
+    meta:{
+      title: "邀请资金明细"
     }
   }
 ]
