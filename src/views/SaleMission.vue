@@ -142,7 +142,7 @@
       >
     </div>
 
-    <div class="flow-mission-second" v-if="status == 2">
+    <div class="flow-mission-second" v-if="status == 2 ||status == 5">
       <div class="flow-mission-title">
         <div class="next-step-btn" @click="changeStatus(1)">上一步</div>
         第二步
@@ -804,21 +804,30 @@ export default class Home extends Vue {
 
         if (this.status == 1) {
           this.end_time =
-            parseInt(this.missionDetailInfo.buyer_time) * 1000 +
+            parseInt(this.missionDetailInfo.step_time) * 1000 +
             1000 * 60 * 30 -
             Date.now();
-        } else if (this.status == 2) {
+        } else if (this.status == 2 || this.status == 5) {
           // this.second_step_start_time = 1000 * 60 * 10;
           this.startSecondCountTime();
 
-          this.second_time =
-            parseInt(this.missionDetailInfo.buyer_time) * 1000 +
+          if(this.status == 2){
+            this.second_time =
+            parseInt(this.missionDetailInfo.step_time) * 1000 +
+            1000 * 60 * 30 -
+            Date.now();
+          }else{
+             this.second_time =
+            parseInt(this.missionDetailInfo.step_time) * 1000 +
             1000 * 60 * 55 -
             Date.now();
+          }
+
+          
         } else if (this.status == 3) {
           this.third_step_start_time = 1000 * 60 * 10;
           this.third_time =
-            parseInt(this.missionDetailInfo.buyer_time) * 1000 +
+            parseInt(this.missionDetailInfo.step_time) * 1000 +
             1000 * 60 * 55 -
             Date.now();
           this.remain_time = Number(this.missionDetailInfo.step_time) * 1000 +
@@ -827,7 +836,7 @@ export default class Home extends Vue {
             console.log("remain_time remain_time remain_time remain_time",this.remain_time)
         } else {
           this.four_time =
-            parseInt(this.missionDetailInfo.buyer_time) * 1000 +
+            parseInt(this.missionDetailInfo.step_time) * 1000 +
             1000 * 60 * 30 -
             Date.now();
         }
@@ -970,6 +979,7 @@ export default class Home extends Vue {
       if (data && data.origin_data) {
         if (data.origin_data.code == 1001) {
           this.getDetailInfo();
+          
         } else {
           Toast(data.origin_data.msg || "未知异常");
         }

@@ -232,10 +232,10 @@ export default class Home extends Vue {
   showRulesModal: any = false;
 
   created() {
+
     getCommentList({
-      limit: 10,
-      page: 1,
-      is_evaluate: 1,
+      is_evaluate_wait:[1,4],
+      is_evaluate:"-1"
     }).then((data: any) => {
       console.log("获取评价的数据", data);
       if (data && data.data && data.data.total) {
