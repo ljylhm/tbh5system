@@ -4,6 +4,7 @@ import VueRouter, { RouteConfig } from 'vue-router'
 import Login from '../views/Login.vue'
 import Forget from '../views/Forget.vue'
 import Register from '../views/Register.vue'
+import Guide from '../views/Guide.vue'
 
 Vue.use(VueRouter)
 
@@ -30,6 +31,14 @@ const routes: Array<RouteConfig> = [
         component: Register,
         meta: {
             title: "注册"
+        }
+    },
+    {
+        path: '/guide',
+        name: 'Guide',
+        component: Guide,
+        meta: {
+            title: "下载"
         }
     }
 ]
