@@ -1060,7 +1060,7 @@ export default class Home extends Vue {
   checkThirdStep() {
     const that = this;
     console.log("result result result", this.result);
-    if (that.missionDetailInfo.step > 3) {
+    if (that.missionDetailInfo.step > 3 && this.missionDetailInfo.step !=5 ) {
       this.changeStatus(4);
     } else {
       if (!this.footImage) {
