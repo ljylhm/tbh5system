@@ -692,11 +692,6 @@ export default class Home extends Vue {
         token: access_token,
         already_time: Date.now() - this.second_step_time + this.second_remain_time,
       };
-      console.log("destroyed destroyed destroyed destroyed", second_step_value);
-      console.log(
-        "destroyed destroyed destroyed destroyed",
-        this.second_step_time
-      );
       window.localStorage.setItem(
         `second_step`,
         JSON.stringify(second_step_value)
@@ -1026,12 +1021,12 @@ export default class Home extends Vue {
       this.remain_time = Number(this.missionDetailInfo.step_time) * 1000 +
             1000 * 60 * 10 -
             Date.now();
-    if (that.missionDetailInfo.step > 2) {
+    if (that.missionDetailInfo.step > 2 && this.missionDetailInfo.step != 5) {
       this.changeStatus(3);
     } else {
       getStepOneOrder({
         id: that.id,
-        step: 2,
+        step: 5,
         type: that.missionDetailInfo.task_type,
         ss_img: that.searchImage,
         is_check_amount: this.is_check_amount == "1" ? "0" : "1",
