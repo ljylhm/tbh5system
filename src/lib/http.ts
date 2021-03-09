@@ -6,6 +6,7 @@ import { Toast } from 'vant';
 import { ElLoadingComponent } from 'element-ui/types/loading'
 import { getToken } from './cache'
 import { VanToast } from 'vant/types/toast';
+import { ljyShowToast } from "./toast";
 
 
 // http://129.211.87.79
@@ -13,13 +14,13 @@ import { VanToast } from 'vant/types/toast';
 // "http://129.211.87.79"
 // "http://124.71.182.201" 
 
-// const access_token = getToken()
-// export const TB_DOMAIN = isDev() ? "http://129.211.87.79" : "http://129.211.87.79"
-// const site_url = isDev() ? "http://129.211.87.79" : "http://129.211.87.79"
-
 const access_token = getToken()
-export const TB_DOMAIN = isDev() ? "http://124.71.182.201" : "http://124.71.182.201"
-const site_url = isDev() ? "http://124.71.182.201" : "http://124.71.182.201"
+export const TB_DOMAIN = isDev() ? "http://129.211.87.79" : "http://129.211.87.79"
+const site_url = isDev() ? "http://129.211.87.79" : "http://129.211.87.79"
+
+// const access_token = getToken()
+// export const TB_DOMAIN = isDev() ? "http://124.71.182.201" : "http://124.71.182.201"
+// const site_url = isDev() ? "http://124.71.182.201" : "http://124.71.182.201"
 
 const STATUS_SUCCESS = 1001
 
@@ -39,16 +40,22 @@ interface IRes<T = any>{
     origin_data: IProtocol<T>
 }
 
-let loadingIns:VanToast
+
+let loadingIns:VanToast | undefined
 const closeLoading = () => {
-    if(loadingIns && loadingIns.clear) loadingIns.clear()
+    console.log("here>>>",loadingIns)
+    if(loadingIns && loadingIns.clear) {
+        loadingIns.clear()
+        loadingIns = undefined
+    }
 }
 
 // 添加请求拦截器
 axios.interceptors.request.use(function (config) {
-    loadingIns = Toast.loading({
+    if(!loadingIns)  loadingIns = Toast.loading({
         message: '加载中...',
         forbidClick: false,
+        duration: 0
     }); 
     return config;
   }, function (error) {

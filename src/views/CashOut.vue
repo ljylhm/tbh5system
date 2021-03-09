@@ -142,15 +142,9 @@ export default class Home extends Vue {
       }
   }
 
-  created() {
-    
-    this.getBuyerInfo();
+  scrollFn(){
 
-    this.getUserOrder();
-
-    this.getTransFerAction();
-
-    const deFn = () => {
+     const deFn = () => {
        if (getScrollTop() + getWindowHeight() + 30 >= getScrollHeight()) {
         ++this.page;
 
@@ -182,8 +176,20 @@ export default class Home extends Vue {
         });
       }
     }
+    this.debounce(deFn)
+  }
 
-    window.addEventListener("scroll",this.debounce(deFn));
+  created() {
+    
+    this.getBuyerInfo();
+
+    this.getUserOrder();
+
+    this.getTransFerAction();
+
+   
+
+    window.addEventListener("scroll",this.scrollFn);
   }
 
   getTransFerAction() {
@@ -194,10 +200,9 @@ export default class Home extends Vue {
     });
   }
 
-  beforeDestory() {
-    console.log("beforeDestory");
+  destroyed() {
     // 卸载掉scroll监听事件
-    window.removeEventListener("scroll", () => {},true);
+    window.removeEventListener("scroll", this.scrollFn);
   }
 
   listData = [];

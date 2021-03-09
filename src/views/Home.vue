@@ -232,7 +232,6 @@ export default class Home extends Vue {
   showRulesModal: any = false;
 
   created() {
-
     getCommentList({
       is_evaluate_wait:[1,4],
       is_evaluate:"-1"
