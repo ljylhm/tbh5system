@@ -6,7 +6,6 @@ import { Toast } from 'vant';
 import { ElLoadingComponent } from 'element-ui/types/loading'
 import { getToken } from './cache'
 import { VanToast } from 'vant/types/toast';
-import { ljyShowToast } from "./toast";
 
 
 // http://129.211.87.79
@@ -14,13 +13,13 @@ import { ljyShowToast } from "./toast";
 // "http://129.211.87.79"
 // "http://124.71.182.201" 
 
-const access_token = getToken()
-export const TB_DOMAIN = isDev() ? "http://129.211.87.79" : "http://129.211.87.79"
-const site_url = isDev() ? "http://129.211.87.79" : "http://129.211.87.79"
-
 // const access_token = getToken()
-// export const TB_DOMAIN = isDev() ? "http://124.71.182.201" : "http://124.71.182.201"
-// const site_url = isDev() ? "http://124.71.182.201" : "http://124.71.182.201"
+// export const TB_DOMAIN = isDev() ? "http://129.211.87.79" : "http://129.211.87.79"
+// const site_url = isDev() ? "http://129.211.87.79" : "http://129.211.87.79"
+
+const access_token = getToken()
+export const TB_DOMAIN = isDev() ? "http://124.71.182.201" : "http://124.71.182.201"
+const site_url = isDev() ? "http://124.71.182.201" : "http://124.71.182.201"
 
 const STATUS_SUCCESS = 1001
 
