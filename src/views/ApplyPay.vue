@@ -1,7 +1,7 @@
 <template>
   <div class="user-order-container">
     <VHeader :msg="'提现申请'" :showExitBtn="true"></VHeader>
-    <VFooter :msg="'资金管理'"></VFooter>
+    <VFooter :msg="'资金管理'" v-if="userData.type != 2"></VFooter>
 
     <div class="user-order-header-1">
       <div class="user-ordre-next_btn" @click="toNext">返回</div>
@@ -221,7 +221,11 @@ export default class Home extends Vue {
   };
 
   toNext() {
-    routerHelper.to("/cashManage");
+    if (this.userData.type == 2) {
+      routerHelper.to("/homeTg");
+    } else {
+      routerHelper.to("/cashManage");
+    }
   }
 }
 </script>

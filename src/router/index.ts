@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import Home from '../views/Home.vue'
+import HomeTg from '../views/HomeTg.vue'
 import AccountManage from '@/views/AccountManage.vue'
 import CreateAccount from '@/views/CreateAccount.vue'
 import CashManage from '@/views/CashManage.vue'
@@ -19,6 +20,7 @@ import WorkOrderDetail from '@/views/WorkOrderDetail.vue'
 import WorkOrderList from '@/views/WorkOrderList.vue'
 import WorkOrderDetailTwo from '@/views/WorkOrderDetailTwo.vue'
 import InviteDetail from '@/views/InviteDetail.vue'
+import InviteDetailOne from '@/views/inviteDetailOne.vue'
 import InviteCharge from '@/views/InviteCharge.vue'
 import RouterHelper from '@/lib/router'
 
@@ -183,6 +185,22 @@ const routes: Array<RouteConfig> = [
     component: InviteCharge,
     meta:{
       title: "邀请资金明细"
+    }
+  },
+  {
+    path: '/homeTg',
+    name: 'HomeTg',
+    component: HomeTg,
+    meta:{
+      title: "首页"
+    }
+  },
+  {
+    path: '/inviteDetailOne',
+    name: 'InviteDetailOne',
+    component: InviteDetailOne,
+    meta:{
+      title: "邀请人详情"
     }
   }
 ]

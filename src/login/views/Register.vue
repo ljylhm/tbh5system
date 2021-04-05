@@ -18,7 +18,6 @@
               :rules="[{ required: true, message: '请填写登录会员名' }]"
             />
           </div>
-
           <div class="forget-content_item">
             <van-field
               v-model="form.phone"
@@ -53,7 +52,7 @@
             />
           </div>
 
-          <div class="forget-content_item">
+          <div class="forget-content_item" v-if="form.type == 0">
             <div class="forget-verify_code">
               <van-field
                 v-model="form.verifyCode"
@@ -114,20 +113,23 @@
             />
           </div>
 
-           <div class="forget-content_item">
+          <div class="forget-content_item">
             <van-field
               v-model="form.card"
               name="请输入身份证号码"
               label="身份证号"
               placeholder="请输入身份证号码"
-               :rules="[
-                { validator: idCardValidator, message: '请输入正确的身份证号码' },
+              :rules="[
+                {
+                  validator: idCardValidator,
+                  message: '请输入正确的身份证号码',
+                },
               ]"
             />
           </div>
 
           <div class="forget-content_item forget-content_item_1">
-            <div class="create-account-image" style="color:#696566">
+            <div class="create-account-image" style="color: #696566">
               <p>上传支付宝截图：</p>
               <div class="create-account-image_content">
                 <van-uploader
@@ -140,14 +142,14 @@
                   class="create-account-image_pic"
                   @click="previewImage(preview_four)"
                 >
-                   <img :src="preview_four" />
+                  <img :src="preview_four" />
                 </div>
               </div>
             </div>
           </div>
 
           <div class="forget-content_item forget-content_item_1">
-            <div class="create-account-image" style="color:#696566">
+            <div class="create-account-image" style="color: #696566">
               <p>上传身份证截图：</p>
               <div class="create-account-image_content">
                 <van-uploader
@@ -159,13 +161,24 @@
                 <div
                   class="create-account-image_pic"
                   @click="previewImage(preview_two)"
-                >
-                </div>
+                ></div>
               </div>
             </div>
           </div>
 
-          <div class="forget-content_item">
+          <div class="forget-content_item forget-content_item_1">
+            <div class="create-account-image" style="color: #696566">
+              <p>选择注册类型：</p>
+              <div class="create-account-image_content">
+                <van-radio-group v-model="form.type" direction="horizontal">
+                  <van-radio name="0">买手</van-radio>
+                  <van-radio name="2">推广员</van-radio>
+                </van-radio-group>
+              </div>
+            </div>
+          </div>
+
+          <div class="forget-content_item" v-if="form.type == 0">
             <van-field
               v-model="form.secret"
               name="请输入邀请码"
@@ -173,8 +186,6 @@
               placeholder="请输入邀请码"
             />
           </div>
-
-          
 
           <div style="margin: 16px">
             <van-button round block type="info" native-type="submit">
@@ -190,7 +201,10 @@
         <div class="create-account-item">
           <div class="create-account-item_label">会员名：</div>
           <div class="create-account-item_input">
-            <input :placeholder="`请输入淘宝会员名`" v-model="buyerform.buyer_name" />
+            <input
+              :placeholder="`请输入淘宝会员名`"
+              v-model="buyerform.buyer_name"
+            />
           </div>
         </div>
 
@@ -373,10 +387,7 @@
             <div class="create-bank_btn create-bank_btn_1" @click="onSubmit3">
               确定提交
             </div>
-            <div
-              class="create-bank_btn create-bank_btn_2"
-              @click="toStepTwo()"
-            >
+            <div class="create-bank_btn create-bank_btn_2" @click="toStepTwo()">
               上一步
             </div>
           </div>
@@ -438,13 +449,13 @@ export default class Forget extends Vue<IProps> {
     passwordAgain: "",
     code: "",
     verifyCode: "",
-    type: 0,
+    type: "0",
     nick: "",
     secret: "",
-    full_name:"",                             // 身份证全名
-    card:"",                                  // 身份证号码
-    card_pic:"",                              // 身份证图片
-    alipay_pic:""                             // 支付宝截图
+    full_name: "", // 身份证全名
+    card: "", // 身份证号码
+    card_pic: "", // 身份证图片
+    alipay_pic: "", // 支付宝截图
   };
 
   buyerform: {
@@ -476,15 +487,12 @@ export default class Forget extends Vue<IProps> {
   preview_four: string =
     "https://imgqn.smm.cn/production/b/image/JxHsO20210117153926.jpeg";
 
-
-  
-
   fileList = [];
   fileList1 = [];
   fileList2 = [];
 
-  fileList4 = []
-  fileList5 = []
+  fileList4 = [];
+  fileList5 = [];
 
   img_one = "";
   img_two = "";
@@ -580,9 +588,7 @@ export default class Forget extends Vue<IProps> {
 
   bindBankData: string[] = [];
 
-  created() {
-   
-  }
+  created() {}
 
   mounted() {
     var verifyCode = new GVerify("forget-verify");
@@ -631,7 +637,7 @@ export default class Forget extends Vue<IProps> {
     this.upLoadImageAction(file.file, 2);
   }
 
-  uploadCardPic(file:any){
+  uploadCardPic(file: any) {
     upLoadImage(file.file).then((res) => {
       if (res && res.data) {
         this.form.card_pic = completeImgUrl(res.data.src);
@@ -639,14 +645,13 @@ export default class Forget extends Vue<IProps> {
     });
   }
 
-  uploadAliPayPic(file:any){
+  uploadAliPayPic(file: any) {
     upLoadImage(file.file).then((res) => {
       if (res && res.data) {
         this.form.alipay_pic = completeImgUrl(res.data.src);
       }
     });
   }
-  
 
   previewImage(pic_url: string) {
     ImagePreview([pic_url]);
@@ -668,9 +673,9 @@ export default class Forget extends Vue<IProps> {
     });
   }
 
-  idCardValidator(val: string){
-    const rule = /^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$|^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/
-    return rule.test(val)
+  idCardValidator(val: string) {
+    const rule = /^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$|^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/;
+    return rule.test(val);
   }
 
   pasAgainValidator(val: string) {
@@ -706,24 +711,31 @@ export default class Forget extends Vue<IProps> {
   }
 
   doRegister() {
-    const form = Object.assign({},this.form,this.buyerform,this.bindForm)
-    console.log("当前的表单",form)
+    const form = Object.assign({}, this.form, this.buyerform, this.bindForm);
+    console.log("当前的表单", form);
+
+    const type = form.type
     register(form).then((data) => {
       if (data && data.data && data.data.access_token) {
+
         const access_token = data.data.access_token;
-        localStorage.setItem("ISLOGIN","1")
+        localStorage.setItem("ISLOGIN", "1");
         // clearCache(CACHE_NAME)
         Toast.success({
           message: "恭喜您注册成功",
-          onClose() {
-            setToken(access_token);
-            const origin = location.origin;
-            window.location.replace(origin);
-          },
+          onClose() {          
+         if (type == "2") {
+              const origin = location.origin;
+              setToken(access_token); 
+              window.location.replace(origin + "#/homeTg");
+            }else{
+              setToken(access_token); 
+              const origin = location.origin;
+              window.location.replace(origin);
+          }}
         });
       }
     });
-  
   }
 
   // 获取验证码
@@ -776,15 +788,15 @@ export default class Forget extends Vue<IProps> {
 
   // 提交的行为
   onSubmit() {
-    console.log("表单 表单",this.form)
-    if(!this.form.card_pic){
-      Toast("请上传身份证截图~")
-      return
+    console.log("表单 表单", this.form);
+    if (!this.form.card_pic) {
+      Toast("请上传身份证截图~");
+      return;
     }
 
-    if(!this.form.alipay_pic){
-      Toast("请上传支付宝截图~")
-      return
+    if (!this.form.alipay_pic) {
+      Toast("请上传支付宝截图~");
+      return;
     }
     this.toStepTwo();
     this.setCache(2);
@@ -834,10 +846,9 @@ export default class Forget extends Vue<IProps> {
   }
 
   onSubmit3() {
-
-    console.log("第一步表单",this.form)
-    console.log("第二步表单",this.buyerform)
-    console.log("第三步表单",this.bindForm)
+    console.log("第一步表单", this.form);
+    console.log("第二步表单", this.buyerform);
+    console.log("第三步表单", this.bindForm);
     if (!this.bindForm.bank) {
       Toast("请选择银行");
       return;
@@ -864,7 +875,6 @@ export default class Forget extends Vue<IProps> {
     }
 
     this.doRegister();
-
   }
 }
 </script>
@@ -913,9 +923,10 @@ export default class Forget extends Vue<IProps> {
       margin: 0 auto;
       @include flex(flex-start);
       align-items: center;
+      font-size: 14px;
     }
 
-    .forget-content_item_1{
+    .forget-content_item_1 {
       padding-left: 16px;
       box-sizing: border-box;
     }

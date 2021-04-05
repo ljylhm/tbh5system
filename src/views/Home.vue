@@ -38,9 +38,9 @@
             }}
           </div>
           <div>支付宝: {{ userData.nick || "--" }}</div>
-          <div>
+          <!-- <div>
             邀请码: <span>{{ userData.secret || "--" }}</span>
-          </div>
+          </div> -->
           <div>
             我的积分: <span>{{ userData.score || "0" }}</span>
              <van-button
@@ -74,7 +74,7 @@
         </div>
       </div>
 
-      <div class="person-container_bottom">
+      <!-- <div class="person-container_bottom">
         <div class="person-container_bottom_left">
           <div>邀请人记录</div>
           <div>
@@ -99,7 +99,7 @@
             >
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
 
     <div class="person-icon">

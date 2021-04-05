@@ -2,11 +2,11 @@ import { httpGet, httpPost } from '@/lib/http';
 import { ILogin, IRegister } from '@/constance/login';
 
 // 登录的方法
-export const login = (phone: string, password: string) => {
+export const login = (phone: string, password: string,type: number | string) => {
     return httpPost<ILogin>("/api/login", {
         phone,
         password,
-        type: 0
+        type: type
     })
 }
 

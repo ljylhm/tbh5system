@@ -17,9 +17,14 @@
 
     <div class="login-btn">
       <van-button type="info" size="small" @click="toLogin">登录</van-button>
-      <div class="login-forget_password"  @click="toForget">忘记密码</div>
+      <div class="login-forget_password" @click="toForget">忘记密码</div>
     </div>
-
+    <div class="login-role" style="font-size: 14px">
+      <van-radio-group v-model="form.type" direction="horizontal">
+        <van-radio name="0">买手</van-radio>
+        <van-radio name="2">推广员</van-radio>
+      </van-radio-group>
+    </div>
     <div class="login-register">
       没有账号？
       <span @click="toRegister">去注册</span>
@@ -31,9 +36,9 @@
 import { Component, Vue } from "vue-property-decorator";
 import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
 import { routerHelper } from "@/login/router";
-import { login } from '@/service/login';
-import { Toast } from 'vant';
-import { getLastPath, setToken } from '@/lib/cache';
+import { getUserInfo, login } from "@/service/login";
+import { Toast } from "vant";
+import { getLastPath, setToken } from "@/lib/cache";
 
 interface IProps {}
 
@@ -46,14 +51,15 @@ export default class Login extends Vue<IProps> {
   form = {
     user: "",
     password: "",
+    type: "0",
   };
 
   toForget() {
     routerHelper.to("/forget");
   }
 
-  toRegister(){
-     routerHelper.to("/register");
+  toRegister() {
+    routerHelper.to("/register");
   }
 
   beforeCreated() {
@@ -61,38 +67,43 @@ export default class Login extends Vue<IProps> {
   }
 
   // 登录方法
-  toLogin(){
-    const { user, password } = this.form
-    if(!user){
-      Toast("请输入用户名")
-      return
+  toLogin() {
+    const { user, password, type } = this.form;
+    if (!user) {
+      Toast("请输入用户名");
+      return;
     }
-    if(!password){
-      Toast("请输入密码")
-      return
+    if (!password) {
+      Toast("请输入密码");
+      return;
     }
 
-    login(user, password).then((data) => {
+    login(user, password, type).then((data) => {
       if (data && data.data && data.data.access_token) {
         const access_token = data.data.access_token;
-        localStorage.setItem("ISLOGIN","1")
+        localStorage.setItem("ISLOGIN", "1");
         Toast.success({
           message: "登录成功",
-          duration:500,
-          onClose(){
-            const last_path = getLastPath();
-            setToken(access_token);
-            if (last_path) {
-              location.replace(last_path)
-            } else {
+          duration: 500,
+          onClose() {
+            if (type == "2") {
               const origin = location.origin;
-              window.location.replace(origin);
+              setToken(access_token); 
+              window.location.replace(origin + "#/homeTg");
+            } else {
+              const last_path = getLastPath();
+              setToken(access_token); 
+              if (last_path) {
+                location.replace(last_path);
+              } else {
+                const origin = location.origin;
+                window.location.replace(origin);
+              }
             }
-          }
-        })
-
+          },
+        });
       }
-    })
+    });
   }
 }
 </script>
@@ -149,13 +160,18 @@ export default class Login extends Vue<IProps> {
     }
   }
 
-  .login-register{
+  .login-role {
+    @include flex(center);
+    margin-top: 10px;
+  }
+
+  .login-register {
     position: absolute;
     width: 100%;
     bottom: 20px;
     font-size: 14px;
     text-align: center;
-    span{
+    span {
       color: #4882f0;
     }
   }

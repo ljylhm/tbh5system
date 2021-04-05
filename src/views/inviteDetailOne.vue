@@ -1,6 +1,6 @@
 <template>
   <div class="user-order-container">
-    <VHeader :msg="'邀请明细'" :showExitBtn="true"></VHeader>
+    <VHeader :msg="'邀请人详细'" :showExitBtn="true"></VHeader>
     <!-- <VFooter :msg="'资金管理'"></VFooter> -->
 
     <div class="user-order-header-1">
@@ -21,81 +21,49 @@
       />
     </van-popup>
 
-    <!-- <div class="apply-pay-content">
-      <div>存款余额：{{ calcMoney() }}元</div>
+    <div class="apply-pay-content">
+      <div>昵称：{{ buyerInfoList.name }}</div>
       <div>
-        邀请奖励余额：{{ userData.invited_amount || "0.00" }}元
-        <span class="zy-font">(30天内仅能提现一次)</span>
+        电话{{ buyerInfoList.phone }}元
       </div>
-      <div>提现方式：银行卡</div>
-      <div class="flex-s">
-        提现类型：<van-field
-          readonly
-          clickable
-          name="picker"
-          :value="advanceForm.type == 0 ? '账户余额' : '邀请余额'"
-          right-icon="arrow"
-          label=""
-          placeholder="点击选择类型"
-          @click="showPicker = true"
+      <div>支付宝{{ buyerInfoList.nick }}元</div>
+      <div>支付宝信息图</div>
+      <div class="flex-s small-img">
+        <img
+          :src="buyerInfoList.alipay_pic"
+          alt=""
+          @click="previewImage(buyerInfoList.alipay_pic)"
         />
       </div>
-      <div>提款金额：</div>
-      <div class="apply-pay-input">
-        <input
-          placeholder="请输入提现金额"
-          v-model="advanceForm.amount"
-          type="number"
-        />
-      </div>
-      <div>输入密码：</div>
-      <div class="apply-pay-input">
-        <input
-          type="password"
-          placeholder="请输入支付密码"
-          v-model="advanceForm.pay_password"
-        />
-      </div>
-      <div>
-        <div class="apply-pay-btn" @click="advanceAction">确认提现</div>
-      </div>
-    </div> -->
+      <div>真实姓名：{{ buyerInfoList.full_name }}</div>
+      <div>身份证号：{{ buyerInfoList.card }}</div>
+      <div>手持身份证照片</div>
 
-    <div class="apply-pay-list">
-      <div class="apply-pay-list-header">邀请记录</div>
-      <div class="apply-pay-list-content" v-if="list.length > 0">
-        <table border="1" color="#ddd" width="100%">
-          <thead style="background: #f2f2f2">
-            <td class="apply-pay-list-1">姓名</td>
-            <td class="apply-pay-list-2">电话</td>
-            <td class="apply-pay-list-3">状态</td>
-            <td class="apply-pay-list-3">操作</td>
-          </thead>
-          <tbody>
-            <tr v-for="(item, key) in list" :key="key">
-              <td class="apply-pay-list-1 zy-font">{{ item.name }}元</td>
-              <td class="apply-pay-list-2">{{ item.phone }}</td>
-              <td class="apply-pay-list-3">
-                {{ item.status == 0 ? "未审核" : item.status == 1 ? "审核通过" : item.status == 2 ? "审核不通过" : "拉入黑名单" }}
-              </td>
-              <td class="apply-pay-list-3">
-                <van-button type="info" size="small" @click="toDetailOne(item.id)">详情</van-button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div>淘宝买号昵称：{{ buyerInfoList.buname }}</div>
+      <div>淘宝买号性别：{{ buyerInfoList.sex == 0 ? "男" : "女" }}</div>
+      <div>淘宝买号验证截图</div>
+      <div class="flex-s small-img">
+        <img
+          v-for="(item, index) in buyerInfoList.img_url"
+          :src="item"
+          :key="index"
+          alt=""
+          @click="previewImage(item)"
+        />
       </div>
+      <div>银行：{{ buyerInfoList.bank }}</div>
+      <div>银行卡卡号：{{ buyerInfoList.card_no }}</div>
+      <div>银行卡开户人：{{ buyerInfoList.bname }}</div>
+      <div>银行卡开户地址：{{ buyerInfoList.address }}</div>
+      <div>银行卡开户地址：{{ buyerInfoList.bank_address }}</div>
 
-      <div
-        v-else
-        style="
-          text-align: center;
-          color: #ddd;
-          font-size: 14px;
-          padding: 15px 0px;
-        "
-      >
-        暂无邀请记录
+      <div class="apply-pay-btn-content" v-if="buyerInfoList.status == 0">
+        <div class="apply-pay-btn apply-pay-btn-1" @click="checkBuyerPass">
+          通过
+        </div>
+        <div class="apply-pay-btn apply-pay-btn-2" @click="checkBuyerNoPass">
+          不通过
+        </div>
       </div>
     </div>
   </div>
@@ -107,7 +75,7 @@ import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
 import Header from "@/components/Header.vue"; // @ is an alias to /src
 import VHeader from "@/components/VHeader.vue"; // @ is an alias to /src
 import VFooter from "@/components/VFooter.vue";
-import { getBuyerList } from "@/service/buyer";
+import { checkBuyerInfo, getBuyerInfo, getBuyerList } from "@/service/buyer";
 import {
   advanceAction,
   confirmGoods,
@@ -120,7 +88,7 @@ import { routerHelper } from "@/router";
 import { getMissionStatus } from "@/lib/helper";
 import { getUserInfo } from "@/service/login";
 import { getInviteList } from "@/service/invite";
-import { Toast } from "vant";
+import { ImagePreview, Toast } from "vant";
 
 @Component({
   components: {
@@ -140,8 +108,43 @@ export default class Home extends Vue {
 
   list: any[] = [];
 
+  buyerInfoList: any = {
+    active: 0,
+    address: "",
+    alipay_pic: "",
+    bank: "",
+    bank_address: "",
+    bname: "",
+    buname: "",
+    card: "",
+    card_no: "",
+    card_pic: "",
+    created_at: "",
+    description: null,
+    full_name: "",
+    id: 0,
+    img_url: "",
+    invited: 0,
+    max_invite: 0,
+    name: "",
+    nick: "",
+    password: "",
+    pay_password: "",
+    phone: "",
+    province: null,
+    qq: null,
+    score: "",
+    secret: "",
+    sex: 0,
+    status: 0,
+    type: 1,
+    updated_at: "",
+    wx: null,
+  };
+
   page: number = 1;
   limit: number = 20;
+  id: any = 0;
 
   created() {
     getUserInfo().then((data) => {
@@ -150,23 +153,18 @@ export default class Home extends Vue {
       }
     });
 
-    this.getInviteList(this.calcPage(this.page));
+    const { id } = routerHelper.getData();
+    if (id) {
+      this.id = id;
+      getBuyerInfo(id).then((data) => {
+        if (data && data.data) {
+          this.buyerInfoList = data.data;
+          this.buyerInfoList.img_url = JSON.parse(this.buyerInfoList.img_url)
+        }
+      });
+    }
 
-    const deFn = () => {
-      if (getScrollTop() + getWindowHeight() + 30 >= getScrollHeight()) {
-        const para = this.calcPage(this.page + 1);
-        getInviteList(para).then((data: any) => {
-          console.log("data", data);
-          if (data && data.origin_data && data.origin_data.code == 1001) {
-            if (data.data.list.length > 0) {
-              this.page = this.page + 1;
-            }
-            this.list = this.list.concat(data.data.list);
-          }
-        });
-      }
-    };
-    window.addEventListener("scroll", this.debounce(deFn));
+    this.getInviteList(this.calcPage(this.page));
   }
 
   beforeDestory() {
@@ -235,10 +233,32 @@ export default class Home extends Vue {
     routerHelper.to("/homeTg");
   }
 
-  toDetailOne(id:any){
-    routerHelper.to("/inviteDetailOne",{
-      id
-    });
+  previewImage(pic_url: string) {
+    ImagePreview([pic_url]);
+  }
+
+  checkBuyerPass() {
+    if (this.id) {
+      checkBuyerInfo(this.id, "pass").then((data) => {
+        Toast("审核完成");
+        const timer = setTimeout(() => {
+          routerHelper.to("/inviteDetail");
+          clearTimeout(timer);
+        }, 2000);
+      });
+    }
+  }
+
+  checkBuyerNoPass() {
+    if (this.id) {
+      checkBuyerInfo(this.id, "nopass").then((data) => {
+        Toast("审核完成");
+        const timer = setTimeout(() => {
+          routerHelper.to("/inviteDetail");
+          clearTimeout(timer);
+        }, 2000);
+      });
+    }
   }
 }
 </script>
@@ -259,6 +279,13 @@ export default class Home extends Vue {
 .flex-s {
   @include flex(flex-start);
   align-items: center;
+}
+
+.small-img {
+  img {
+    width: 80px;
+    height: 80px;
+  }
 }
 
 .zy-font {
@@ -363,17 +390,28 @@ export default class Home extends Vue {
         width: 100%;
       }
     }
+    .apply-pay-btn-content {
+      @include flex(space-between);
+      align-items: center;
+    }
     .apply-pay-btn {
-      width: 100%;
-      height: 50px;
-      line-height: 50px;
+      width: 40%;
+      height: 40px;
+      line-height: 40px;
       text-align: center;
-      background: #457ee8;
+
       display: block;
       color: #fff;
       margin-top: 20px;
       font-size: 18px;
       border-radius: 25px;
+    }
+
+    .apply-pay-btn-1 {
+      background: #457ee8;
+    }
+    .apply-pay-btn-2 {
+      background: #f90;
     }
     & > div {
       margin-bottom: 10px;
@@ -404,7 +442,7 @@ export default class Home extends Vue {
     }
     .apply-pay-list-2 {
       text-align: center;
-      width: 25% !important;
+      width: 45%;
       padding: 10px 0px;
     }
     .apply-pay-list-3 {

@@ -1,7 +1,7 @@
 <template>
   <div class="user-order-container">
     <VHeader :msg="'邀请奖励记录'" :showExitBtn="true"></VHeader>
-    <VFooter :msg="'资金管理'"></VFooter>
+    <!-- <VFooter :msg="'资金管理'"></VFooter> -->
 
     <div class="user-order-header-1">
       <div class="user-ordre-next_btn" @click="toNext">返回</div>
@@ -120,7 +120,7 @@ export default class Home extends Vue {
   end_bottom = false;
 
   toNext() {
-    routerHelper.to("/");
+    routerHelper.to("/homeTg");
   }
 }
 </script>

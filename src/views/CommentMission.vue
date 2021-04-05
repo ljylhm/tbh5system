@@ -59,13 +59,23 @@
             v-for="(item, key) in missionDetailInfo.evaluate_pic_go"
             :key="key"
           >
-            <img v-if="item" :src="item" style="width: 60px; height: 60px" />
+            <img
+              v-if="item"
+              :src="item"
+              style="width: 60px; height: 60px"
+              @click="preViewImage2(item)"
+            />
           </div>
         </div>
 
         <div class="comment-pic-list" v-else>
           <div v-for="(item, key) in missionDetailInfo.evaluate_pic" :key="key">
-            <img v-if="item" :src="item" style="width: 60px; height: 60px" />
+            <img
+              v-if="item"
+              :src="item"
+              style="width: 60px; height: 60px"
+              @click="preViewImage2(item)"
+            />
           </div>
         </div>
       </div>
@@ -308,6 +318,44 @@ export default class Home extends Vue {
         }
       });
     }
+  }
+
+  // 预览图片2
+  preViewImage2(Url: string) {
+    var blob = new Blob([""], { type: "application/octet-stream" });
+
+    var url = URL.createObjectURL(blob);
+
+    var a = document.createElement("a");
+
+    a.href = Url;
+    console.log("here>>>")
+
+    a.download = Url.replace(/(.*\/)*([^.]+.*)/gi, "$2").split("?")[0];
+
+    var e = document.createEvent("MouseEvents");
+
+    e.initMouseEvent(
+      "click",
+      true,
+      false,
+      window,
+      0,
+      0,
+      0,
+      0,
+      0,
+      false,
+      false,
+      false,
+      false,
+      0,
+      null
+    );
+
+    a.dispatchEvent(e);
+
+    URL.revokeObjectURL(url);
   }
 }
 </script>

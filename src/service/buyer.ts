@@ -24,3 +24,14 @@ export const editBuyer = (form:any) => {
 
 // 修改用户信息的一些接口
 export const editUserInfo = (editInfo:any) => httpPost("/api/update",editInfo)
+
+// 买手信息的接口
+export const getBuyerInfo = (id:any) => httpPost("/api/buyer/info",{
+    id
+})
+
+// 买手信息的接口
+export const checkBuyerInfo = (id:any,confirm:string) => httpPost("/api/buyer/check",{
+    id,
+    confirm
+})
