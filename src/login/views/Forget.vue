@@ -56,6 +56,18 @@
           </div>
         </div>
 
+        <div class="forget-content_item"> 
+            <div class="login-role" style="font-size: 14px;margin-left:14px">
+            <van-radio-group v-model="form.type" direction="horizontal">
+              <div class="login-role-tab">选择注册类型</div>
+              <van-radio name="0">买手</van-radio>
+              <van-radio name="2">推广员</van-radio>
+            </van-radio-group>
+          </div>
+        </div>
+
+     
+
         <div class="forget-content_item">
           <div class="forget-verify_code">
             <van-field
@@ -109,6 +121,7 @@ export default class Forget extends Vue<IProps> {
     fir_pass: "",
     sec_pass: "",
     verifyCode: "",
+    type: "0"
   };
 
   resetForm = {
@@ -191,7 +204,7 @@ export default class Forget extends Vue<IProps> {
   }
 
   getVerifyCode() {
-    sendMessageV2(this.form.phone).then((data) => {
+    sendMessageV2(this.form.phone,this.form.type).then((data) => {
       console.log("data data", data);
       if (data && data.origin_data.code == 1001) {
         Toast("发送成功，请注意查收");
@@ -240,7 +253,7 @@ export default class Forget extends Vue<IProps> {
       return;
     }
 
-    resetPassword(this.form).then((data) => {
+    resetPassword(this.form,this.form.type).then((data) => {
       if (data && data.origin_data) {
         if (data.origin_data.code == 1001) {
           Toast("重置密码成功,请重新登录");
@@ -392,5 +405,11 @@ export default class Forget extends Vue<IProps> {
       }
     }
   }
+}
+
+.login-role-tab{
+  font-size: 14px;
+  color: #646566;
+  margin-right: 12px;
 }
 </style>

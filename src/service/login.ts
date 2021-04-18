@@ -28,24 +28,24 @@ export const getUserInfo = () => {
 }
 
 // 发送短信的方法
-export const sendMessage = (phone:string) => {
+export const sendMessage = (phone:string,type:number | string = 0) => {
     return httpGet("/api/sms",{
         phone,
-        type: 0
+        type
     })
 }
 
 // 发送短信的方法
-export const sendMessageV2 = (phone:string) => {
+export const sendMessageV2 = (phone:string,type:number | string = 0) => {
     return httpGet("/api/sms_back",{
         phone,
-        type: 0
+        type
     })
 }
 
-export const resetPassword = (form:any) => {
+export const resetPassword = (form:any,type:number | string = 0) => {
     return httpPost("/api/reset_password",{
         ...form,
-        type: 0
+        type
     })
 }

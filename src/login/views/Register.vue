@@ -52,7 +52,7 @@
             />
           </div>
 
-          <div class="forget-content_item" v-if="form.type == 0">
+          <div class="forget-content_item">
             <div class="forget-verify_code">
               <van-field
                 v-model="form.verifyCode"
@@ -64,6 +64,18 @@
             </div>
             <div class="forget-verify_content" @click="renewRandom">
               {{ showRandom }}
+            </div>
+          </div>
+
+          <div class="forget-content_item forget-content_item_1">
+            <div class="create-account-image" style="color: #696566">
+              <p>选择注册类型：</p>
+              <div class="create-account-image_content">
+                <van-radio-group v-model="form.type" direction="horizontal">
+                  <van-radio name="0">买手</van-radio>
+                  <van-radio name="2">推广员</van-radio>
+                </van-radio-group>
+              </div>
             </div>
           </div>
 
@@ -162,18 +174,6 @@
                   class="create-account-image_pic"
                   @click="previewImage(preview_two)"
                 ></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="forget-content_item forget-content_item_1">
-            <div class="create-account-image" style="color: #696566">
-              <p>选择注册类型：</p>
-              <div class="create-account-image_content">
-                <van-radio-group v-model="form.type" direction="horizontal">
-                  <van-radio name="0">买手</van-radio>
-                  <van-radio name="2">推广员</van-radio>
-                </van-radio-group>
               </div>
             </div>
           </div>
@@ -746,7 +746,7 @@ export default class Forget extends Vue<IProps> {
     } else if (!phone_rule.test(this.form.phone)) {
       Toast("请填写正确的手机号码");
     } else {
-      sendMessage(this.form.phone).then((data) => {
+      sendMessage(this.form.phone,this.form.type).then((data) => {
         if (data && data.origin_data.code == 1001) {
           this.sendStatus = 1;
           let count = 60;
